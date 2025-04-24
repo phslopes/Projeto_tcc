@@ -1,0 +1,100 @@
+/* LoginPage.css */
+
+.login-page {
+    display: flex;
+    min-height: 80vh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9fafb;
+    padding: 3rem 1rem;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 28rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.login-header {
+    text-align: center;
+}
+
+.login-header h1 {
+    font-size: 28px;
+    font-weight: bold;
+    color: #111827;
+}
+
+.login-header p {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.login-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-title {
+    font-size: 25px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.login-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.login-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.login-field input {
+    padding: 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+}
+
+.login-error {
+    color: #ef4444;
+    font-size: 0.875rem;
+}
+
+.login-button {
+    padding: 0.75rem;
+    background: #B20000;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.login-button:disabled {
+    background: #ff4d7e;
+    cursor: not-allowed;
+}
+
+.login-footer {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
