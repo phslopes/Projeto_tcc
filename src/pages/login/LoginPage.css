@@ -10,6 +10,14 @@
     padding: 3rem 1rem;
 }
 
+.login-logo {
+    display: block;
+    margin: 0 auto;
+    width: 50%;
+    height: auto;
+  }
+  
+
 .login-container {
     width: 100%;
     max-width: 28rem;
@@ -28,23 +36,11 @@
     color: #111827;
 }
 
-.login-header p {
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-    color: #6b7280;
-}
-
 .login-card {
     background: white;
     padding: 2rem;
     border-radius: 1rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.login-title {
-    font-size: 25px;
-    font-weight: bold;
-    text-align: center;
 }
 
 .login-description {

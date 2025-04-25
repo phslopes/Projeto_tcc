@@ -1,13 +1,16 @@
 import { useState } from "react";
-import "./LoginPage.css"; 
+import "./LoginPage.css";
+import imgFatec from "../../assets/imgFatec.png";//para importar a imagem do assets
+import { useNavigate } from "react-router-dom"; //para redirecionar o usuario para outra pagina
 
 function LoginPage() {
+    const navigate = useNavigate();//hook
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmitt = (e) => {
         e.preventDefault();
         setIsLoading(true);
         setError("");
@@ -15,6 +18,7 @@ function LoginPage() {
         // Simulação de autenticação
         setTimeout(() => { //set timeout para simular o tempo de resposta do servidor 500ms
             if (username == ("admin")) {
+                navigate("/admin");
                 alert("Login como ADMIN!"); // simula redirecionamento
             } else {
                 setError("Credenciais inválidas. Tente novamente.");
@@ -31,10 +35,10 @@ function LoginPage() {
                 </div>
 
                 <div className="login-card">
-                    <h2 className="login-title">Login</h2>
+                    <img src={imgFatec} alt="Logo" className="login-logo" />
                     <p className="login-description">Entre com seus dados para acessar</p>
 
-                    <form onSubmit={handleSubmit} className="login-form">
+                    <form onSubmit={handleSubmitt} className="login-form">
 
                         <div className="login-field">
                             <label htmlFor="username">Email</label>
@@ -43,12 +47,12 @@ function LoginPage() {
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                placeholder="Enter your username"
+                                placeholder="Entre com seu email"
                                 required
-                                // autoComplete="username"
+                                autoComplete="username"
                             />
                         </div>
-                        
+
                         <div className="login-field">
                             <label htmlFor="password">Senha</label>
                             <input
@@ -56,16 +60,18 @@ function LoginPage() {
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                placeholder="Enter your password"
+                                placeholder="Entre com sua senha"
                                 required
-                                // autoComplete="current-password"
+                                autoComplete="current-password"
                             />
                         </div>
 
                         {error && <p className="login-error">{error}</p>}
+
                         <button type="submit" className="login-button" disabled={isLoading}>
-                            {isLoading ? "Signing in..." : "Sign in"}
+                            {isLoading ? "Entrando..." : "Entrar"}
                         </button>
+
                     </form>
 
                     <div className="login-footer">
