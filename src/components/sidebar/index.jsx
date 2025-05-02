@@ -1,22 +1,30 @@
 import { useLocation, Link } from "react-router-dom";
+import { IoHomeOutline } from "react-icons/io5";
+import { MdOutlineDashboard } from "react-icons/md";
+import { FaChalkboardTeacher, FaBook, FaDoorOpen, FaCalendarAlt } from "react-icons/fa";
 
 export default function Sidebar({ userRole }) {
   const location = useLocation();
 
   const linkClass = (path) =>
-    `sidebar-link${location.pathname === path ? " active" : ""}`;
+    `flex items-center gap-2 p-2 rounded hover:bg-gray-200 ${location.pathname === path ? "bg-gray-300" : ""
+    }`;
 
   return (
-    <aside className="sidebar open">
-      <header className="sidebar-header">
-        <h2>Sistema de Horários</h2>
+    
+    <aside className="w-60 h-screen bg-gray-100 text-gray-800 p-4 rounded-lg shadow divide-y divide-gray-300">
+      {/* Header */}
+      <header className="pb-4 mb-4">
+        <h2 className="text-xl font-bold">Sistema de Horários</h2>
       </header>
 
-      <nav className="sidebar-nav">
-        <ul>
+      {/* Navegação */}
+      <nav className="space-y-4 flex-1">
+        <ul className="space-y-2">
           <li>
             <Link to="/" className={linkClass("/")}>
-              <span className="icon">🏠</span> Início
+              <IoHomeOutline size={20} />
+              Início
             </Link>
           </li>
 
@@ -24,30 +32,34 @@ export default function Sidebar({ userRole }) {
             <>
               <li>
                 <Link to="/admin" className={linkClass("/admin")}>
-                  <span className="icon">📊</span> Dashboard Admin
+                  <MdOutlineDashboard size={20} />
+                  Dashboard Admin
                 </Link>
               </li>
               <li>
                 <Link to="/admin/professores" className={linkClass("/admin/professores")}>
-                  <span className="icon">👥</span> Professores
+                  <FaChalkboardTeacher size={20} />
+                  Professores
                 </Link>
               </li>
               <li>
                 <Link to="/admin/disciplinas" className={linkClass("/admin/disciplinas")}>
-                  <span className="icon">📚</span> Disciplinas
+                  <FaBook size={20} />
+                  Disciplinas
                 </Link>
               </li>
               <li>
                 <Link to="/admin/salas" className={linkClass("/admin/salas")}>
-                  <span className="icon">🚪</span> Salas
+                  <FaDoorOpen size={20} />
+                  Salas
                 </Link>
               </li>
             </>
           ) : (
-            // ainda não implementado mas pode ser usado para o aluno e professor
             <li>
               <Link to="/agenda" className={linkClass("/agenda")}>
-                <span className="icon">🗓️</span> Agenda
+                <FaCalendarAlt size={20} />
+                Agenda
               </Link>
             </li>
           )}
