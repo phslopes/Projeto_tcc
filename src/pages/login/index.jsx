@@ -20,7 +20,13 @@ function LoginPage() {
             if (username == ("admin")) {
                 navigate("/admin");
                 alert("Login como ADMIN!"); // simula redirecionamento
-            } else {
+            }else if (username == ("aluno")) {
+                navigate("/aluno");
+                alert("Login como ALUNO!"); // simula redirecionamento
+            } else if (username == ("professor")) {
+                navigate("/professor");
+                alert("Login como PROFESSOR!"); // simula redirecionamento
+            }else {
                 setError("Credenciais inválidas. Tente novamente.");
             }
             setIsLoading(false);
@@ -61,7 +67,7 @@ function LoginPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Entre com sua senha"
-                                required
+                                // required
                                 autoComplete="current-password"
                             />
                         </div>
@@ -75,7 +81,7 @@ function LoginPage() {
                     </form>
 
                     <div className="login-footer">
-                        <p>Dica: No momento só existe um login de usuario "admin"</p>
+                        <p>Dica: Só existem os logins de usuario "admin, aluno, professor"</p>
                     </div>
                 </div>
             </div>
