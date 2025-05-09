@@ -19,13 +19,10 @@ function LoginPage() {
         setTimeout(() => { //set timeout para simular o tempo de resposta do servidor 500ms
             if (username == ("admin")) {
                 navigate("/admin");
-                alert("Login como ADMIN!"); // simula redirecionamento
             }else if (username == ("aluno")) {
                 navigate("/aluno");
-                alert("Login como ALUNO!"); // simula redirecionamento
             } else if (username == ("professor")) {
                 navigate("/professor");
-                alert("Login como PROFESSOR!"); // simula redirecionamento
             }else {
                 setError("Credenciais inválidas. Tente novamente.");
             }
