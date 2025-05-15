@@ -20,27 +20,29 @@ CREATE TABLE Disciplina (
 CREATE TABLE professor_disciplina(
     id_professor INT,
     id_disciplina INT,
+    ano INT,
+    semestre INT,
     PRIMARY KEY (id_professor, id_disciplina)
     FOREIGN KEY (id_professor) REFERENCES Professor(id_professor),
     FOREIGN KEY (id_disciplina) REFERENCES Disciplina(id_disciplina)
 );
 
 CREATE TABLE Sala (
-    id_sala INT PRIMARY KEY,
-    nome VARCHAR(50) NOT NULL,
+    numero_sala INT ,
     tipo_sala VARCHAR(50) NOT NULL,
     status BOOLEAN
+    PRIMARY KEY (numero_sala, tipo_sala)
 );
 
 CREATE TABLE alocacao (
     id_sala INT,
-    id_professor,
     id_disciplina,
+    ano INT,
+    semestre INT,
     tipo VARCHAR(50),
-    PRIMARY KEY (id_sala, id_professor, id_disciplina)
+    PRIMARY KEY (id_sala, id_disciplina)
     FOREIGN KEY (id_sala) REFERENCES Sala(id_sala),
-    FOREIGN KEY (id_professor) REFERENCES professor_disciplina (id_professor)
-    FOREIGN KEY (id_disciplina) REFERENCES professor_disciplina (id_diciplina)
+    FOREIGN KEY (id_disciplina) REFERENCES Disciplina (id_diciplina)
 );
 
 
