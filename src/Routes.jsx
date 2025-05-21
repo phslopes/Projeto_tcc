@@ -7,6 +7,8 @@ import Disciplinas from "./pages/disciplinas";
 import StudentDashboard from "./pages/Dashboard/student";
 import TeacherDashboard from "./pages/Dashboard/teacher";
 import AdminLayout from "./components/AdminLayout";
+import Associacao from "./pages/associacao";
+
 
 function RoutesApp() {
   return (
@@ -20,6 +22,8 @@ function RoutesApp() {
           <Route path="professores" element={<Professores />} />
           <Route path="disciplinas" element={<Disciplinas />} />
           <Route path="salas" element={<Salas />} />
+          <Route path="associacao" element={<Associacao/>} />
+
           {/* redireciona qualquer outra sub-rota de /admin de volta ao dashboard */}
         </Route>
 
