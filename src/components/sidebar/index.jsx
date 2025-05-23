@@ -36,7 +36,7 @@ export default function Sidebar({ userRole }) {
               <li>
                 <Link to="/admin" className={linkClass("/admin")}>
                   <MdOutlineDashboard size={20} />
-                  Dashboard Admin
+                  Dashboard
                 </Link>
               </li>
               <li>

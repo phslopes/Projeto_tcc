@@ -74,7 +74,6 @@ function DisciplinasPage() {
             <th>Hora Início</th>
             <th>Semestre</th>
             <th>Curso</th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
