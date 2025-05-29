@@ -24,19 +24,13 @@ export default function Sidebar({ userRole }) {
       {/* Navegação */}
       <nav className="space-y-4 flex-1">
         <ul className="space-y-2">
-          <li>
-            <Link to="/" className={linkClass("/")}>
-              <IoHomeOutline size={20} />
-              Início
-            </Link>
-          </li>
 
           {userRole === "admin" ? (
             <>
               <li>
                 <Link to="/admin" className={linkClass("/admin")}>
                   <MdOutlineDashboard size={20} />
-                  Dashboard
+                  Inicio
                 </Link>
               </li>
               <li>
@@ -60,7 +54,7 @@ export default function Sidebar({ userRole }) {
               <li>
                 <Link to="/admin/associacao" className={linkClass("/admin/associacao")}>
                   <FaChartBar size={20} />
-                  Associação
+                  Alocação
                 </Link>
               </li>
             </>

@@ -38,12 +38,12 @@ function AssociacaoPage() {
   return (
     <div className="container-associacao">
       <div className="header-associacao">
-        <h2>Associações Cadastradas</h2>
+        <h2>Alocações Cadastradas</h2>
         <button className="btn-add" onClick={() => {
           setMostrarForm(true);
           setEditandoIndex(null);
         }}>
-          NOVA ASSOCIAÇÃO
+          NOVA ALOCAÇÃO
         </button>
       </div>
 
@@ -80,7 +80,7 @@ function AssociacaoPage() {
       {confirmandoExclusao !== null && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <p>Deseja realmente excluir esta associação?</p>
+            <p>Deseja realmente excluir esta alocação?</p>
             <div className="botoes-confirmar">
               <button className="btn-vermelho" onClick={excluirAssociacao}>Sim, excluir</button>
               <button onClick={() => setConfirmandoExclusao(null)}>Cancelar</button>

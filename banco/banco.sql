@@ -36,7 +36,7 @@ CREATE TABLE Sala (
 
 CREATE TABLE alocacao (
     id_sala INT,
-    id_disciplina,
+    id_disciplina INT,
     ano INT,
     semestre INT,
     tipo VARCHAR(50),

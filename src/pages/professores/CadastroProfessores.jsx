@@ -55,7 +55,7 @@ function CadastroProfessores({ onSave, onCancel, initialData }) {
           <label className="flex flex-col text-sm font-medium text-gray-700">
             Telefone:
             <input
-              type="text"
+              type="tel"
               value={telefone}
               onChange={(e) => setTelefone(e.target.value)}
               placeholder="Informe o telefone"
@@ -66,7 +66,7 @@ function CadastroProfessores({ onSave, onCancel, initialData }) {
           <label className="flex flex-col text-sm font-medium text-gray-700">
             Email:
             <input
-              type="text"
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Informe o email"
