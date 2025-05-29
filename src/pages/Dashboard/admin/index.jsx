@@ -30,7 +30,7 @@ export default function DashboardAdmin() {
   return (
     <div className="container-dashboard">
       <div className="header-dashboard">
-        <h2>Filtrar Associações</h2>
+        <h2>Filtros de Alocação</h2>
         </div>
         <hr className="linha-separadora" />
       <div className="filtros">

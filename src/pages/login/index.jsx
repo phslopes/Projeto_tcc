@@ -48,6 +48,7 @@ function LoginPage() {
                             <input
                                 id="username"
                                 type="text"
+                                // type="email"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 placeholder="Entre com seu email"
