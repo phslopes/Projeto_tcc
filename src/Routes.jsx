@@ -4,9 +4,11 @@ import DashboardAdmin from "./pages/Dashboard/admin";
 import Salas from "./pages/salas";
 import Professores from "./pages/professores";
 import Disciplinas from "./pages/disciplinas";
+import Reserva from "./pages/reserva";
 import StudentDashboard from "./pages/Dashboard/student";
 import TeacherDashboard from "./pages/Dashboard/teacher";
 import AdminLayout from "./components/AdminLayout";
+import TeacherLayout from "./components/TeacherLayout";
 import Associacao from "./pages/associacao";
 
 
@@ -29,7 +31,11 @@ function RoutesApp() {
 
         {/* Rotas de student e teacher não usam esse layout */}
         <Route path="/aluno" element={<StudentDashboard />} />
-        <Route path="/professor" element={<TeacherDashboard />} />
+
+        <Route path="/professor/*" element={<TeacherLayout />}>
+          <Route index element={<TeacherDashboard />} />
+          <Route path="reserva" element={<Reserva />} />
+        </Route>
       </Routes>
     </Router>
   );
