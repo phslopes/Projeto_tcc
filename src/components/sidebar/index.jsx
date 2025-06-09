@@ -1,6 +1,6 @@
 import { useLocation, Link } from "react-router-dom";
 import { IoHomeOutline } from "react-icons/io5";
-import { MdOutlineDashboard } from "react-icons/md";
+import { MdOutlineDashboard, MdLink } from "react-icons/md";
 import { FaChalkboardTeacher, FaBook, FaDoorOpen, FaCalendarAlt } from "react-icons/fa";
 
 export default function Sidebar({ userRole }) {
@@ -52,6 +52,16 @@ export default function Sidebar({ userRole }) {
                 <Link to="/admin/salas" className={linkClass("/admin/salas")}>
                   <FaDoorOpen size={20} />
                   Salas
+                </Link>
+              </li>
+              <Link to="/admin/associacao-professor-disciplina" className={linkClass("/admin/associacao-professor-disciplina")}>
+                  <MdLink size={20} /> 
+                  Professor/Disciplina
+                </Link>
+              <li>
+                <Link to="/admin/alocacoes" className={linkClass("/admin/alocacoes")}>
+                  <FaDoorOpen size={20} />
+                  Disciplina/Sala
                 </Link>
               </li>
             </>

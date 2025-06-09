@@ -4,6 +4,8 @@ import DashboardAdmin from "./pages/Dashboard/admin";
 import Salas from "./pages/salas";
 import Professores from "./pages/professores";
 import Disciplinas from "./pages/disciplinas";
+import ProfDiscPage from "./pages/ProfessorDisc";  
+import AssociacaoProfessorDisciplinaPage from "./pages/AssociacaoProfessorDisciplina/AssociacaoProfessorDisciplinaPage"; 
 import StudentDashboard from "./pages/Dashboard/student";
 import TeacherDashboard from "./pages/Dashboard/teacher";
 import AdminLayout from "./components/AdminLayout";
@@ -20,7 +22,8 @@ function RoutesApp() {
           <Route path="professores" element={<Professores />} />
           <Route path="disciplinas" element={<Disciplinas />} />
           <Route path="salas" element={<Salas />} />
-          {/* redireciona qualquer outra sub-rota de /admin de volta ao dashboard */}
+          <Route path="associacao-professor-disciplina" element={<AssociacaoProfessorDisciplinaPage />} /> 
+          <Route path="alocacoes" element={<ProfDiscPage />} />     
         </Route>
 
         {/* Rotas de student e teacher não usam esse layout */}
@@ -30,4 +33,5 @@ function RoutesApp() {
     </Router>
   );
 }
+
 export default RoutesApp;
