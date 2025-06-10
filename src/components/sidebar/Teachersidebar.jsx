@@ -1,12 +1,13 @@
 import { useLocation, Link } from "react-router-dom";
 import { IoHomeOutline } from "react-icons/io5";
-import { MdOutlineDashboard, MdLink } from "react-icons/md";
+import { MdOutlineDashboard } from "react-icons/md";
 import { FaChalkboardTeacher, FaBook, FaDoorOpen, FaCalendarAlt } from "react-icons/fa";
 import { useState } from "react";
 import { FaChartBar } from "react-icons/fa";
 
 
-export default function Sidebar({ userRole }) {
+
+export default function Teachersidebar({ userRole }) {
   const location = useLocation();
 
   const linkClass = (path) =>
@@ -25,41 +26,19 @@ export default function Sidebar({ userRole }) {
       <nav className="space-y-4 flex-1">
         <ul className="space-y-2">
 
-          {userRole === "admin" ? (
+          {userRole === "professor" ? (
             <>
               <li>
-                <Link to="/admin" className={linkClass("/admin")}>
+                <Link to="/professor" className={linkClass("/professor")}>
                   <MdOutlineDashboard size={20} />
                   Inicio
                 </Link>
               </li>
               <li>
-                <Link to="/admin/professores" className={linkClass("/admin/professores")}>
-                  <FaChalkboardTeacher size={20} />
-                  Professores
-                </Link>
-              </li>
-              <li>
-                <Link to="/admin/disciplinas" className={linkClass("/admin/disciplinas")}>
-                  <FaBook size={20} />
-                  Disciplinas
-                </Link>
-              </li>
-              <li>
-                <Link to="/admin/salas" className={linkClass("/admin/salas")}>
-                  <FaDoorOpen size={20} />
-                  Salas
-                </Link>
-              </li>
-              <Link to="/admin/associacao-professor-disciplina" className={linkClass("/admin/associacao-professor-disciplina")}>
-                  <MdLink size={20} /> 
-                  Professor/Disciplina
-                </Link>
-              <li>
-                <Link to="/admin/alocacoes" className={linkClass("/admin/alocacoes")}>
-                  <FaDoorOpen size={20} />
-                  Disciplina/Sala
-                </Link>
+                <Link to="/professor/reserva" className={linkClass("/professor/reserva")}>
+  <FaCalendarAlt size={20} />
+  Reserva
+    </Link>
               </li>
             </>
           ) : (

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import CadastroSalas from "./CadastroSalas";
-import { FaEdit, FaTrash } from "react-icons/fa"; 
+import { FaEdit, FaTrash } from "react-icons/fa";
 import "./SalasPage.css";
 
 function SalasPage() {
@@ -65,44 +65,44 @@ function SalasPage() {
       </div>
 
       <table className="table-salas">
-  <thead>
-    <tr className="header-linha">
-      <th>Número</th>
-      <th>Tipo</th>
-    </tr>
-  </thead>
-  <tbody>
-    {salas.map((d, index) => (
-      <tr key={index} className="linha-sala">
-        <td className="coluna-centro">{d.number}</td>
-        <td className="coluna-centro">{d.type}</td>
-        <td className="coluna-centro">
-          <div className="botoes-acoes">
-            <button className="btn-acao" onClick={() => iniciarEdicao(index)}>
-              <FaEdit />
-            </button>
-            <button className="btn-acao" onClick={() => excluirSala(index)}>
-              <FaTrash />
-            </button>
-          </div>
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</table>
+        <thead>
+          <tr className="header-linha">
+            <th>Número</th>
+            <th>Tipo</th>
+          </tr>
+        </thead>
+        <tbody>
+          {salas.map((d, index) => (
+            <tr key={index} className="linha-sala">
+              <td className="coluna-centro">{d.number}</td>
+              <td className="coluna-centro">{d.type}</td>
+              <td className="coluna-centro">
+                <div className="botoes-acoes">
+                  <button className="btn-acao" onClick={() => iniciarEdicao(index)}>
+                    <FaEdit />
+                  </button>
+                  <button className="btn-acao" onClick={() => excluirSala(index)}>
+                    <FaTrash />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
 
 
       {mostrarForm && (
-  <CadastroSalas
-    onSave={salaEditando ? atualizarSala : adicionarSala}
-    onCancel={() => {
-      setMostrarForm(false);
-      setSalaEditando(null);
-    }}
-    initialData={salaEditando}
-  />
-)}
+        <CadastroSalas
+          onSave={salaEditando ? atualizarSala : adicionarSala}
+          onCancel={() => {
+            setMostrarForm(false);
+            setSalaEditando(null);
+          }}
+          initialData={salaEditando}
+        />
+      )}
 
     </div>
   );
