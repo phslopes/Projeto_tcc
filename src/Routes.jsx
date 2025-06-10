@@ -9,6 +9,8 @@ import AssociacaoProfessorDisciplinaPage from "./pages/AssociacaoProfessorDiscip
 import StudentDashboard from "./pages/Dashboard/student";
 import TeacherDashboard from "./pages/Dashboard/teacher";
 import AdminLayout from "./components/AdminLayout";
+import Associacao from "./pages/associacao";
+
 
 function RoutesApp() {
   return (

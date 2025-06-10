@@ -89,13 +89,13 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
           </label>
 
           <label className="flex flex-col text-sm font-medium text-gray-700">
-            Dia (1 a 7):
+            Dia (2 a 7):
             <input
               type="number"
               value={dia}
               onChange={(e) => setDia(e.target.value)}
               placeholder="Dia"
-              min="1"
+              min="2"
               max="7"
               className="mt-1 p-2 border border-gray-300 rounded"
             />
