@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
 import CadastroDisciplinas from "./CadastroDisciplinas";
-import "./DisciplinaPage.css";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import "./DisciplinaPage.css"; //
 
 function DisciplinasPage() {
   const [disciplinas, setDisciplinas] = useState([]);
@@ -9,6 +9,7 @@ function DisciplinasPage() {
   const [disciplinaEditando, setDisciplinaEditando] = useState(null);
 
   const adicionarDisciplina = (disciplina) => {
+    // Unicidade agora é baseada em nome e turno (chave composta)
     const duplicada = disciplinas.some(
       (d) => d.nome === disciplina.nome && d.turno === disciplina.turno
     );
@@ -21,10 +22,13 @@ function DisciplinasPage() {
   };
 
   const atualizarDisciplina = (disciplinaAtualizada) => {
-    const { index } = disciplinaEditando;
+    // A disciplinaEditando agora contém a PK original (nome e turno)
+    const { oldNome, oldTurno } = disciplinaEditando;
+
+    // Verifica duplicidade com outras disciplinas, exceto a que está sendo editada
     const duplicada = disciplinas.some(
-      (d, i) =>
-        i !== index &&
+      (d) =>
+        !(d.nome === oldNome && d.turno === oldTurno) && // Não é o item original
         d.nome === disciplinaAtualizada.nome &&
         d.turno === disciplinaAtualizada.turno
     );
@@ -32,23 +36,32 @@ function DisciplinasPage() {
       alert("Já existe uma disciplina com esse nome e turno.");
       return;
     }
-    const novaLista = [...disciplinas];
-    novaLista[index] = disciplinaAtualizada;
+
+    const novaLista = disciplinas.map((d) =>
+      // Identifica a disciplina a ser atualizada pela PK antiga (nome e turno)
+      d.nome === oldNome && d.turno === oldTurno ? disciplinaAtualizada : d
+    );
     setDisciplinas(novaLista);
     setDisciplinaEditando(null);
     setMostrarForm(false);
   };
 
-  const excluirDisciplina = (index) => {
+  const excluirDisciplina = (disciplinaParaExcluir) => { // Recebe o objeto completo
     if (window.confirm("Tem certeza que deseja excluir esta disciplina?")) {
-      const novaLista = [...disciplinas];
-      novaLista.splice(index, 1);
+      const novaLista = disciplinas.filter(
+        (d) => !(d.nome === disciplinaParaExcluir.nome && d.turno === disciplinaParaExcluir.turno)
+      );
       setDisciplinas(novaLista);
     }
   };
 
-  const iniciarEdicao = (index) => {
-    setDisciplinaEditando({ ...disciplinas[index], index });
+  const iniciarEdicao = (disciplina) => {
+    // Ao iniciar a edição, guarda os dados originais da disciplina para identificar no update
+    setDisciplinaEditando({
+      ...disciplina,
+      oldNome: disciplina.nome, // Guarda o nome original
+      oldTurno: disciplina.turno, // Guarda o turno original
+    });
     setMostrarForm(true);
   };
 
@@ -70,30 +83,27 @@ function DisciplinasPage() {
             <th>Nome</th>
             <th>Turno</th>
             <th>Carga</th>
-            <th>Dia</th>
-            <th>Hora Início</th>
             <th>Semestre</th>
             <th>Curso</th>
+            <th>Ações</th> {/* Adicionado Ações */}
           </tr>
         </thead>
         <tbody>
           {disciplinas.map((d, index) => (
-            <tr key={index}>
+            // A key deve ser única, como nome+turno. Fallback para index se a PK composta não for única no local.
+            <tr key={`${d.nome}-${d.turno}-${index}`}>
               <td>{d.nome}</td>
               <td>{d.turno}</td>
               <td>{d.carga}</td>
-              <td>{d.dia}</td>
-              <td>{d.hora_inicio}</td>
-              <td>{d.semestre}</td>
+              <td>{d.semestre_curso}</td>
               <td>{d.curso}</td>
               <td>
-                <button className="btn-acao" onClick={() => iniciarEdicao(index)}>
+                <button className="btn-acao" onClick={() => iniciarEdicao(d)}>
                   <FaEdit />
                 </button>
-                <button className="btn-acao" onClick={() => excluirDisciplina(index)}>
+                <button className="btn-acao" onClick={() => excluirDisciplina(d)}>
                   <FaTrash />
                 </button>
-
               </td>
             </tr>
           ))}

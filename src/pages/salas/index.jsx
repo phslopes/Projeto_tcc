@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import CadastroSalas from "./CadastroSalas";
+import CadastroSalas from "./CadastroSalas"; //
 import { FaEdit, FaTrash } from "react-icons/fa";
-import "./SalasPage.css";
+import "./SalasPage.css"; //
 
 function SalasPage() {
   const [salas, setSalas] = useState([]);
@@ -9,8 +9,9 @@ function SalasPage() {
   const [salaEditando, setSalaEditando] = useState(null);
 
   const adicionarSala = (sala) => {
+    // Unicidade agora é baseada em numero_sala e tipo_sala
     const duplicada = salas.some(
-      (s) => s.number === sala.number && s.type === sala.type
+      (s) => s.number === sala.number && s.type.toLowerCase() === sala.type.toLowerCase()
     );
     if (duplicada) {
       alert("Sala já cadastrada com este número e tipo.");
@@ -21,34 +22,48 @@ function SalasPage() {
   };
 
   const atualizarSala = (salaAtualizada) => {
-    const { index } = salaEditando;
+    // A salaEditando agora contém a PK original (number e type)
+    const { oldNumber, oldType } = salaEditando;
+
+    // Verifica duplicidade com outras salas, exceto a que está sendo editada
     const duplicada = salas.some(
-      (s, i) =>
-        i !== index &&
+      (s) =>
+        !(s.number === oldNumber && s.type.toLowerCase() === oldType.toLowerCase()) && // Não é o item original
         s.number === salaAtualizada.number &&
-        s.type === salaAtualizada.type
+        s.type.toLowerCase() === salaAtualizada.type.toLowerCase()
     );
     if (duplicada) {
       alert("Já existe uma sala com esse número e tipo.");
       return;
     }
-    const novaLista = [...salas];
-    novaLista[index] = salaAtualizada;
+
+    const novaLista = salas.map((s) =>
+      // Identifica a sala a ser atualizada pela PK antiga (number e type)
+      s.number === oldNumber && s.type.toLowerCase() === oldType.toLowerCase()
+        ? salaAtualizada
+        : s
+    );
     setSalas(novaLista);
     setSalaEditando(null);
     setMostrarForm(false);
   };
 
-  const excluirSala = (index) => {
+  const excluirSala = (salaParaExcluir) => { // Recebe o objeto completo
     if (window.confirm("Tem certeza que deseja excluir esta sala?")) {
-      const novaLista = [...salas];
-      novaLista.splice(index, 1);
+      const novaLista = salas.filter(
+        (s) => !(s.number === salaParaExcluir.number && s.type.toLowerCase() === salaParaExcluir.type.toLowerCase())
+      );
       setSalas(novaLista);
     }
   };
 
-  const iniciarEdicao = (index) => {
-    setSalaEditando({ ...salas[index], index });
+  const iniciarEdicao = (sala) => {
+    // Ao iniciar a edição, guarda os dados originais da sala para identificar no update
+    setSalaEditando({
+      ...sala,
+      oldNumber: sala.number, // Guarda o número original
+      oldType: sala.type,   // Guarda o tipo original
+    });
     setMostrarForm(true);
   };
 
@@ -69,19 +84,21 @@ function SalasPage() {
           <tr className="header-linha">
             <th>Número</th>
             <th>Tipo</th>
+            <th>Ações</th> {/* Adicionado Ações */}
           </tr>
         </thead>
         <tbody>
           {salas.map((d, index) => (
-            <tr key={index} className="linha-sala">
+            // A key deve ser única, como number+type. Fallback para index se a PK composta não for única no local.
+            <tr key={`${d.number}-${d.type}-${index}`} className="linha-sala">
               <td className="coluna-centro">{d.number}</td>
               <td className="coluna-centro">{d.type}</td>
               <td className="coluna-centro">
                 <div className="botoes-acoes">
-                  <button className="btn-acao" onClick={() => iniciarEdicao(index)}>
+                  <button className="btn-acao" onClick={() => iniciarEdicao(d)}>
                     <FaEdit />
                   </button>
-                  <button className="btn-acao" onClick={() => excluirSala(index)}>
+                  <button className="btn-acao" onClick={() => excluirSala(d)}>
                     <FaTrash />
                   </button>
                 </div>
@@ -90,8 +107,6 @@ function SalasPage() {
           ))}
         </tbody>
       </table>
-
-
 
       {mostrarForm && (
         <CadastroSalas
@@ -103,7 +118,6 @@ function SalasPage() {
           initialData={salaEditando}
         />
       )}
-
     </div>
   );
 }

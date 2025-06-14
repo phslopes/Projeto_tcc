@@ -4,9 +4,7 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
   const [nome, setNome] = useState("");
   const [turno, setTurno] = useState("");
   const [carga, setCarga] = useState("");
-  const [dia, setDia] = useState("");
-  const [hora_inicio, setHoraInicio] = useState("");
-  const [semestre, setSemestre] = useState("");
+  const [semestre_curso, setSemestreCurso] = useState(""); // Nome corrigido para semestre_curso
   const [curso, setCurso] = useState("");
 
   useEffect(() => {
@@ -14,10 +12,15 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
       setNome(initialData.nome);
       setTurno(initialData.turno);
       setCarga(initialData.carga);
-      setDia(initialData.dia);
-      setHoraInicio(initialData.hora_inicio);
-      setSemestre(initialData.semestre);
+      setSemestreCurso(initialData.semestre_curso); // Nome corrigido
       setCurso(initialData.curso);
+    } else {
+      // Limpa os campos quando não há initialData (novo cadastro)
+      setNome("");
+      setTurno("");
+      setCarga("");
+      setSemestreCurso("");
+      setCurso("");
     }
   }, [initialData]);
 
@@ -26,17 +29,15 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
     if (
       !nome.trim() ||
       !turno.trim() ||
-      !carga.trim() ||
-      !dia.trim() ||
-      !hora_inicio.trim() ||
-      !semestre.trim() ||
+      !carga ||
+      !semestre_curso || // Campo corrigido
       !curso.trim()
     ) {
       alert("Preencha todos os campos!");
       return;
     }
 
-    onSave({ nome, turno, carga, dia, hora_inicio, semestre, curso });
+    onSave({ nome, turno, carga: parseInt(carga), semestre_curso: parseInt(semestre_curso), curso }); // Garante que carga e semestre_curso são números
   };
 
   return (
@@ -60,6 +61,8 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
               onChange={(e) => setNome(e.target.value)}
               placeholder="Nome da disciplina"
               className="mt-1 p-2 border border-gray-300 rounded"
+              // ReadOnly se estiver editando e o nome/turno for parte da PK (se não quiser que a PK mude)
+              readOnly={initialData ? true : false}
             />
           </label>
 
@@ -69,6 +72,8 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
               value={turno}
               onChange={(e) => setTurno(e.target.value)}
               className="mt-1 p-2 border border-gray-300 rounded"
+              // ReadOnly se estiver editando e o nome/turno for parte da PK
+              readOnly={initialData ? true : false}
             >
               <option value="">Selecione</option>
               <option value="Manhã">Manhã</option>
@@ -89,34 +94,11 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
           </label>
 
           <label className="flex flex-col text-sm font-medium text-gray-700">
-            Dia (2 a 7):
-            <input
-              type="number"
-              value={dia}
-              onChange={(e) => setDia(e.target.value)}
-              placeholder="Dia"
-              min="2"
-              max="7"
-              className="mt-1 p-2 border border-gray-300 rounded"
-            />
-          </label>
-
-          <label className="flex flex-col text-sm font-medium text-gray-700">
-            Hora de Início:
-            <input
-              type="time"
-              value={hora_inicio}
-              onChange={(e) => setHoraInicio(e.target.value)}
-              className="mt-1 p-2 border border-gray-300 rounded"
-            />
-          </label>
-
-          <label className="flex flex-col text-sm font-medium text-gray-700">
             Semestre:
             <input
               type="number"
-              value={semestre}
-              onChange={(e) => setSemestre(e.target.value)}
+              value={semestre_curso} // Campo corrigido
+              onChange={(e) => setSemestreCurso(e.target.value)} // Campo corrigido
               placeholder="Semestre"
               min="1"
               className="mt-1 p-2 border border-gray-300 rounded"
