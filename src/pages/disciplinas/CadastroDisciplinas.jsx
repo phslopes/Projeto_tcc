@@ -4,7 +4,7 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
   const [nome, setNome] = useState("");
   const [turno, setTurno] = useState("");
   const [carga, setCarga] = useState("");
-  const [semestre_curso, setSemestreCurso] = useState(""); // Nome corrigido para semestre_curso
+  const [semestre_curso, setSemestreCurso] = useState("");
   const [curso, setCurso] = useState("");
 
   useEffect(() => {
@@ -12,10 +12,9 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
       setNome(initialData.nome);
       setTurno(initialData.turno);
       setCarga(initialData.carga);
-      setSemestreCurso(initialData.semestre_curso); // Nome corrigido
+      setSemestreCurso(initialData.semestre_curso);
       setCurso(initialData.curso);
     } else {
-      // Limpa os campos quando não há initialData (novo cadastro)
       setNome("");
       setTurno("");
       setCarga("");
@@ -30,14 +29,20 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
       !nome.trim() ||
       !turno.trim() ||
       !carga ||
-      !semestre_curso || // Campo corrigido
+      !semestre_curso ||
       !curso.trim()
     ) {
       alert("Preencha todos os campos!");
       return;
     }
 
-    onSave({ nome, turno, carga: parseInt(carga), semestre_curso: parseInt(semestre_curso), curso }); // Garante que carga e semestre_curso são números
+    onSave({
+      nome,
+      turno,
+      carga: parseInt(carga),
+      semestre_curso: parseInt(semestre_curso),
+      curso
+    });
   };
 
   return (
@@ -61,8 +66,8 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
               onChange={(e) => setNome(e.target.value)}
               placeholder="Nome da disciplina"
               className="mt-1 p-2 border border-gray-300 rounded"
-              // ReadOnly se estiver editando e o nome/turno for parte da PK (se não quiser que a PK mude)
-              readOnly={initialData ? true : false}
+              // ReadOnly se estiver editando (PK não editável diretamente no form para evitar confusão)
+              readOnly={!!initialData}
             />
           </label>
 
@@ -72,8 +77,8 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
               value={turno}
               onChange={(e) => setTurno(e.target.value)}
               className="mt-1 p-2 border border-gray-300 rounded"
-              // ReadOnly se estiver editando e o nome/turno for parte da PK
-              readOnly={initialData ? true : false}
+              // ReadOnly se estiver editando
+              readOnly={!!initialData}
             >
               <option value="">Selecione</option>
               <option value="Manhã">Manhã</option>
@@ -97,8 +102,8 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
             Semestre:
             <input
               type="number"
-              value={semestre_curso} // Campo corrigido
-              onChange={(e) => setSemestreCurso(e.target.value)} // Campo corrigido
+              value={semestre_curso}
+              onChange={(e) => setSemestreCurso(e.target.value)}
               placeholder="Semestre"
               min="1"
               className="mt-1 p-2 border border-gray-300 rounded"
