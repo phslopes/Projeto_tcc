@@ -6,12 +6,14 @@ import Professores from "./pages/professores";
 import Disciplinas from "./pages/disciplinas";
 import Reserva from "./pages/reserva";
 import ProfDiscPage from "./pages/ProfessorDisc";  
-import AssociacaoProfessorDisciplinaPage from "./pages/AssociacaoProfessorDisciplina/AssociacaoProfessorDisciplinaPage"; 
+// import AssociacaoProfessorDisciplinaPage from "./pages/AssociacaoProfessorDisciplina/AssociacaoProfessorDisciplinaPage"; 
 import StudentDashboard from "./pages/Dashboard/student";
 import TeacherDashboard from "./pages/Dashboard/teacher";
 import AdminLayout from "./components/AdminLayout";
 import TeacherLayout from "./components/TeacherLayout";
 import PrivateRoute from "./components/PrivateRoute"; 
+import AlocacoesPage from "./pages/alocacao";
+
 
 function RoutesApp() {
   return (
@@ -25,8 +27,9 @@ function RoutesApp() {
             <Route path="professores" element={<Professores />} />
             <Route path="disciplinas" element={<Disciplinas />} />
             <Route path="salas" element={<Salas />} />
-            <Route path="associacao-professor-disciplina" element={<AssociacaoProfessorDisciplinaPage />} /> 
-            <Route path="alocacoes" element={<ProfDiscPage />} />     
+            {/* <Route path="associacao-professor-disciplina" element={<AssociacaoProfessorDisciplinaPage />} />  */}
+            <Route path="ProfessorDisc" element={<ProfDiscPage />} />  
+            <Route path="alocacoes" element={<AlocacoesPage />} />   
             <Route path="*" element={<Navigate to="/admin" replace />} />
           </Route>
         </Route>

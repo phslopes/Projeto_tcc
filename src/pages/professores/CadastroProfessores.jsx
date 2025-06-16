@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 function CadastroProfessores({ onSave, onCancel, initialData }) {
+  const [id_professor, setIdProfessor] = useState(""); // Novo estado para ID do professor (apenas para edição)
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");
@@ -8,9 +9,16 @@ function CadastroProfessores({ onSave, onCancel, initialData }) {
 
   useEffect(() => {
     if (initialData) {
+      setIdProfessor(initialData.id_professor); // Define o ID para edição
       setNome(initialData.nome);
       setTelefone(initialData.telefone);
       setEmail(initialData.email);
+    } else {
+      // Limpa os campos para novo cadastro
+      setIdProfessor("");
+      setNome("");
+      setTelefone("");
+      setEmail("");
     }
   }, [initialData]);
 
@@ -25,7 +33,9 @@ function CadastroProfessores({ onSave, onCancel, initialData }) {
       return;
     }
 
-    onSave({ nome, telefone, email});
+    // Se for edição, inclui o id_professor no objeto
+    const professorData = initialData ? { ...initialData, nome, telefone, email } : { nome, telefone, email };
+    onSave(professorData);
   };
 
   return (
@@ -41,6 +51,18 @@ function CadastroProfessores({ onSave, onCancel, initialData }) {
           {initialData ? "Editar Cadastro" : "Cadastrar Professor"}
         </h3>
         <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
+          {initialData && ( // Exibe o ID apenas em modo de edição
+            <label className="flex flex-col text-sm font-medium text-gray-700">
+              ID do Professor:
+              <input
+                type="text"
+                value={id_professor}
+                readOnly // ID não deve ser editável
+                className="mt-1 p-2 border border-gray-300 rounded bg-gray-100 cursor-not-allowed"
+              />
+            </label>
+          )}
+
           <label className="flex flex-col text-sm font-medium text-gray-700">
             Nome:
             <input
@@ -55,18 +77,19 @@ function CadastroProfessores({ onSave, onCancel, initialData }) {
           <label className="flex flex-col text-sm font-medium text-gray-700">
             Telefone:
             <input
-              type="tel"
+              type="text"
               value={telefone}
               onChange={(e) => setTelefone(e.target.value)}
               placeholder="Informe o telefone"
               className="mt-1 p-2 border border-gray-300 rounded"
+              maxLength={11} // Limita o tamanho do telefone
             />
           </label>
 
           <label className="flex flex-col text-sm font-medium text-gray-700">
             Email:
             <input
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Informe o email"

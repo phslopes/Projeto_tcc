@@ -8,6 +8,10 @@ function CadastroSalas({ onSave, onCancel, initialData }) {
     if (initialData) {
       setNumber(initialData.number);
       setType(initialData.type);
+    } else {
+      // Limpa os campos quando não há initialData (novo cadastro)
+      setNumber("");
+      setType("");
     }
   }, [initialData]);
 
@@ -17,7 +21,8 @@ function CadastroSalas({ onSave, onCancel, initialData }) {
       alert("Preencha todos os campos!");
       return;
     }
-    onSave({ number, type });
+    // Garante que o number é um número e o type está em lowercase para consistência com o backend (ENUM)
+    onSave({ number: parseInt(number), type: type });
   };
 
   return (
@@ -44,6 +49,8 @@ function CadastroSalas({ onSave, onCancel, initialData }) {
               }
               placeholder="Número da sala"
               className="mt-1 p-2 border border-gray-300 rounded"
+              // ReadOnly se estiver editando e o número/tipo for parte da PK (se não quiser que a PK mude)
+              readOnly={initialData ? true : false}
             />
           </label>
 
@@ -53,6 +60,8 @@ function CadastroSalas({ onSave, onCancel, initialData }) {
               value={type}
               onChange={(e) => setType(e.target.value)}
               className="mt-1 p-2 border border-gray-300 rounded"
+              // ReadOnly se estiver editando e o número/tipo for parte da PK
+              readOnly={initialData ? true : false}
             >
               <option value="">Selecione o tipo</option>
               <option value="Sala">Sala</option>
