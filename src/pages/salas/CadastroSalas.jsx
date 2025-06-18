@@ -17,12 +17,22 @@ function CadastroSalas({ onSave, onCancel, initialData }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!number.trim() || !type.trim()) {
-      alert("Preencha todos os campos!");
+    
+    if (!number || number.trim() === "") {
+      alert("Preencha o número da sala!");
       return;
     }
+    
+    if (!type || type === "") {
+      alert("Selecione o tipo da sala!");
+      return;
+    }
+    
     // Garante que o number é um número e o type está em lowercase para consistência com o backend (ENUM)
-    onSave({ number: parseInt(number), type: type.toLowerCase() });
+    onSave({ 
+      number: parseInt(number), 
+      type: type.toLowerCase() 
+    });
   };
 
   return (
@@ -65,7 +75,7 @@ function CadastroSalas({ onSave, onCancel, initialData }) {
             >
               <option value="">Selecione o tipo</option>
               <option value="Sala">Sala</option>
-              <option value="Laboratório">Laboratório</option>
+              <option value="Laboratorio">Laboratório</option>
             </select>
           </label>
 
