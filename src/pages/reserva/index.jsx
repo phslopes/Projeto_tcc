@@ -21,6 +21,7 @@ export default function Reserva() {
   const [linhaConfirmada, setLinhaConfirmada] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
 
   // Busca dados do backend
   useEffect(() => {
@@ -121,27 +122,9 @@ export default function Reserva() {
   const confirmarReserva = async () => {
     setMostrarPopup(false);
     setError(null);
-    try {
-      // Ajusta horário para formato HH:MM:SS
-      let horario = filtros.horario;
-      if (horario && horario.length === 5) horario = horario + ':00';
-      await api.post('/allocations', {
-        numero_sala: parseInt(filtros.numero_sala),
-        tipo_sala: filtros.tipo_sala,
-        id_professor: parseInt(filtros.id_professor),
-        nome: filtros.nome,
-        turno: filtros.turno,
-        ano: anoAtual,
-        semestre_alocacao: semestreAtual,
-        dia_semana: parseInt(filtros.dia_semana),
-        hora_inicio: horario,
-        tipo_alocacao: 'esporadico',
-      });
-      setReservados([...reservados, linhaConfirmada]);
-      alert('Reserva solicitada com sucesso!');
-    } catch (err) {
-      setError('Erro ao solicitar reserva: ' + err.message);
-    }
+    // Remove a chamada da API - apenas simula a reserva
+    setReservados([...reservados, linhaConfirmada]);
+    setMostrarConfirmacao(true);
   };
 
   // Monta linhas possíveis para reserva
@@ -290,6 +273,26 @@ export default function Reserva() {
               <button onClick={confirmarReserva} style={{ marginRight: '10px', backgroundColor: 'green', color: 'white' }}>Sim</button>
               <button onClick={() => setMostrarPopup(false)}>Cancelar</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {mostrarConfirmacao && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.4)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{ background: 'white', padding: 32, borderRadius: 8, minWidth: 300, textAlign: 'center' }}>
+            <h3>Reserva realizada com sucesso!</h3>
+            <button onClick={() => setMostrarConfirmacao(false)} style={{ marginTop: 16, padding: '8px 24px', borderRadius: 4, background: '#4caf50', color: 'white', border: 'none', fontWeight: 'bold' }}>OK</button>
           </div>
         </div>
       )}
