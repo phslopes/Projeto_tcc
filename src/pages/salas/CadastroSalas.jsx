@@ -22,7 +22,7 @@ function CadastroSalas({ onSave, onCancel, initialData }) {
       return;
     }
     // Garante que o number é um número e o type está em lowercase para consistência com o backend (ENUM)
-    onSave({ number: parseInt(number), type: type });
+    onSave({ number: parseInt(number), type: type.toLowerCase() });
   };
 
   return (
