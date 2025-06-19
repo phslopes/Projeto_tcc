@@ -1,133 +1,150 @@
 import React, { useState, useEffect } from 'react';
 import './ReservaPage.css';
+import { api } from '../../utils/api';
 
-const dados = [
-  { curso: 'Segunda', turno: 'Manhã', semestre: '1º', disciplina: 'Cálculo', professor: 'Prof. Cachucho', sala: '8', tipoSala: 'Laboratório', horario: '08:00' },
-  { curso: 'Terça', turno: 'Tarde', semestre: '2º', disciplina: 'Algoritmos', professor: 'Prof. Ulisses', sala: '5', tipoSala: 'Sala', horario: '13:00' },
-  { curso: 'Quarta', turno: 'Manhã', semestre: '3º', disciplina: 'Física', professor: 'Prof. Ana', sala: '2', tipoSala: 'Laboratório', horario: '09:40' },
-  { curso: 'Quinta', turno: 'Noite', semestre: '4º', disciplina: 'Banco de Dados', professor: 'Prof. Marcos', sala: '10', tipoSala: 'Sala', horario: '19:00' },
-  { curso: 'Sexta', turno: 'Tarde', semestre: '2º', disciplina: 'Programação', professor: 'Prof. Bia', sala: '6', tipoSala: 'Laboratório', horario: '14:50' },
-  { curso: 'Sábado', turno: 'Manhã', semestre: '1º', disciplina: 'Matemática', professor: 'Prof. Carla', sala: '3', tipoSala: 'Sala', horario: '10:00' },
-  { curso: 'Segunda', turno: 'Noite', semestre: '5º', disciplina: 'Redes', professor: 'Prof. Leo', sala: '9', tipoSala: 'Laboratório', horario: '20:30' },
-  { curso: 'Terça', turno: 'Tarde', semestre: '3º', disciplina: 'Engenharia de Software', professor: 'Prof. Paulo', sala: '4', tipoSala: 'Sala', horario: '15:30' },
-];
-
-
-  
 export default function Reserva() {
+  const [professores, setProfessores] = useState([]);
+  const [disciplinas, setDisciplinas] = useState([]);
+  const [salas, setSalas] = useState([]);
+  const [associacoes, setAssociacoes] = useState([]);
   const [filtros, setFiltros] = useState({
-    curso: '',
+    id_professor: '',
+    nome: '',
     turno: '',
-    semestre: '',
-    professor: '',
-    disciplina: '',
-    tipoSala: '',
+    numero_sala: '',
+    tipo_sala: '',
+    dia_semana: '',
     horario: '',
   });
-
-const [selecionado, setSelecionado] = useState(null);
-
   const [reservados, setReservados] = useState([]);
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const [linhaConfirmada, setLinhaConfirmada] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
 
- const handleSelecionar = (item) => {
-  if (reservados.includes(item)) return;
-  setSelecionado(selecionado === item ? null : item);
-};
-
-
-  const handleConfirmar = () => {
-  setLinhaConfirmada(selecionado);
-  setMostrarPopup(true);
-};
-
-  const confirmarReserva = () => {
-  setReservados([...reservados, selecionado]);
-  setSelecionado(null);
-  setMostrarPopup(false);
-};
-
-
-  const gerarHorarios = () => {
-    const horarios = [];
-    let hora = 8;
-    let minuto = 0;
-
-    while (hora < 22 || (hora === 22 && minuto === 0)) {
-      const horaFormatada = `${hora.toString().padStart(2, '0')}:${minuto.toString().padStart(2, '0')}`;
-      horarios.push(horaFormatada);
-      minuto += 50;
-      if (minuto >= 60) {
-        minuto -= 60;
-        hora += 1;
+  // Busca dados do backend
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [profRes, discRes, salaRes, assocRes] = await Promise.all([
+          api.get('/professors'),
+          api.get('/disciplines'),
+          api.get('/rooms'),
+          api.get('/professor-disciplines'),
+        ]);
+        setProfessores(profRes);
+        setDisciplinas(discRes);
+        setSalas(salaRes);
+        setAssociacoes(assocRes);
+      } catch (err) {
+        setError('Erro ao carregar dados: ' + err.message);
+      } finally {
+        setLoading(false);
       }
-    }
-    return horarios;
-  };
+    };
+    fetchData();
+  }, []);
 
-  const horarios = gerarHorarios();
+  // Calcula ano e semestre atuais
+  const anoAtual = new Date().getFullYear();
+  const mesAtual = new Date().getMonth() + 1;
+  const semestreAtual = mesAtual <= 6 ? 1 : 2;
 
-  const horariosPorTurno = {
-    Manhã: horarios.filter(h => h >= '08:00' && h < '12:00'),
-    Tarde: horarios.filter(h => h >= '12:00' && h < '18:00'),
-    Noite: horarios.filter(h => h >= '18:00' && h <= '22:00'),
-  };
-  
+  // Filtra disciplinas do professor selecionado
+  const disciplinasDoProfessor = associacoes
+    .filter(a => String(a.id_professor) === String(filtros.id_professor))
+    .map(a => ({ nome: a.disciplina_nome, turno: a.disciplina_turno }));
 
-const TurnoPorHorario = (horario) => {
-  if (horario >= '08:00' && horario < '12:00') return 'Manhã';
-  if (horario >= '12:00' && horario < '18:00') return 'Tarde';
-  if (horario >= '18:00' && horario <= '22:00') return 'Noite';
-  return '';
-};
+  // Disciplinas únicas para o select de disciplina
+  const nomesDisciplinasUnicos = Array.from(new Set(disciplinasDoProfessor.map(d => d.nome)));
 
-const handleFiltroChange = (e) => {
-  const { name, value } = e.target;
+  // Turnos disponíveis para a disciplina selecionada
+  const turnosDisponiveis = Array.from(
+    new Set(
+      disciplinasDoProfessor
+        .filter(d => d.nome === filtros.nome)
+        .map(d => d.turno)
+    )
+  );
 
-  if (name === 'horario') {
-    const turnoDetectado = TurnoPorHorario(value);
+  // Salas disponíveis (todas)
+  const tiposSala = [
+    { value: 'sala', label: 'Sala' },
+    { value: 'laboratorio', label: 'Laboratório' },
+  ];
+
+  // Dias e horários disponíveis para a associação selecionada
+  const diasDisponiveis = Array.from(
+    new Set(
+      associacoes
+        .filter(a => String(a.id_professor) === String(filtros.id_professor) && a.disciplina_nome === filtros.nome && a.disciplina_turno === filtros.turno)
+        .map(a => a.dia_semana)
+    )
+  );
+
+  const horariosDisponiveis = Array.from(
+    new Set(
+      associacoes
+        .filter(a => String(a.id_professor) === String(filtros.id_professor) && a.disciplina_nome === filtros.nome && a.disciplina_turno === filtros.turno && String(a.dia_semana) === String(filtros.dia_semana))
+        .map(a => a.hora_inicio)
+    )
+  );
+
+  // Dias da semana
+  const diasSemana = [
+    { value: 2, label: 'Segunda' },
+    { value: 3, label: 'Terça' },
+    { value: 4, label: 'Quarta' },
+    { value: 5, label: 'Quinta' },
+    { value: 6, label: 'Sexta' },
+    { value: 7, label: 'Sábado' },
+  ];
+
+  // Handle filtro change
+  const handleFiltroChange = (e) => {
+    const { name, value } = e.target;
     setFiltros(prev => ({
       ...prev,
-      horario: value,
-      turno: turnoDetectado
+      [name]: value,
+      // Se mudar disciplina, limpa turno
+      ...(name === 'nome' ? { turno: '' } : {})
     }));
-  } else if (name === 'turno') {
-    setFiltros(prev => ({
-      ...prev,
-      turno: value,
-      horario: '' // reseta horário se turno mudar
-    }));
-  } else {
-    setFiltros(prev => ({ ...prev, [name]: value }));
-  }
-};
+  };
 
+  // Handle reserva
+  const handleConfirmar = (item) => {
+    setLinhaConfirmada(item);
+    setMostrarPopup(true);
+  };
 
+  const confirmarReserva = async () => {
+    setMostrarPopup(false);
+    setError(null);
+    // Remove a chamada da API - apenas simula a reserva
+    setReservados([...reservados, linhaConfirmada]);
+    setMostrarConfirmacao(true);
+  };
 
-  const professoresFiltrados = filtros.disciplina
-    ? [...new Set(dados.filter(item => item.disciplina === filtros.disciplina).map(item => item.professor))]
-    : [...new Set(dados.map(item => item.professor))];
+  // Monta linhas possíveis para reserva
+  const linhasReserva = salas
+    .filter(sala =>
+      (!filtros.tipo_sala || sala.tipo_sala === filtros.tipo_sala) &&
+      (!filtros.numero_sala || String(sala.numero_sala) === String(filtros.numero_sala))
+    )
+    .map(sala => ({
+      numero_sala: sala.numero_sala,
+      tipo_sala: sala.tipo_sala,
+      nome: filtros.nome,
+      turno: filtros.turno,
+      horario: filtros.horario,
+      dia_semana: filtros.dia_semana,
+    }))
+    .filter(item => item.nome && item.turno && item.horario && item.dia_semana);
 
-  const disciplinasFiltradas = filtros.professor
-    ? [...new Set(dados.filter(item => item.professor === filtros.professor).map(item => item.disciplina))]
-    : [...new Set(dados.map(item => item.disciplina))];
-  
-
-
-
-
-
-const dadosFiltrados = dados.filter(item =>
-  (!filtros.curso || item.curso === filtros.curso) &&
-  (!filtros.turno || item.turno === filtros.turno) &&
-  (!filtros.tipoSala || item.tipoSala === filtros.tipoSala) &&
-  (!filtros.horario || item.horario === filtros.horario)
-);
-
-
-  const deveMostrarTabela =
-    filtros.curso || filtros.turno || filtros.horario || filtros.tipoSala;
+  if (loading) return <div>Carregando...</div>;
+  if (error) return <div style={{ color: 'red' }}>{error}</div>;
 
   return (
     <div className="container-dashboard">
@@ -139,19 +156,28 @@ const dadosFiltrados = dados.filter(item =>
       <div className="filtros-superiores">
         <div className="filtro">
           <label>Professor</label>
-          <select name="professor" value={filtros.professor} onChange={handleFiltroChange}>
-            <option value="">Todos</option>
-            {professoresFiltrados.map(p => (
-              <option key={p} value={p}>{p}</option>
+          <select name="id_professor" value={filtros.id_professor} onChange={handleFiltroChange}>
+            <option value="">Selecione</option>
+            {professores.map(p => (
+              <option key={p.id_professor} value={p.id_professor}>{p.nome}</option>
             ))}
           </select>
         </div>
         <div className="filtro">
           <label>Disciplina</label>
-          <select name="disciplina" value={filtros.disciplina} onChange={handleFiltroChange}>
-            <option value="">Todas</option>
-            {disciplinasFiltradas.map(d => (
-              <option key={d} value={d}>{d}</option>
+          <select name="nome" value={filtros.nome} onChange={handleFiltroChange}>
+            <option value="">Selecione</option>
+            {nomesDisciplinasUnicos.map(nome => (
+              <option key={nome} value={nome}>{nome}</option>
+            ))}
+          </select>
+        </div>
+        <div className="filtro">
+          <label>Turno</label>
+          <select name="turno" value={filtros.turno} onChange={handleFiltroChange}>
+            <option value="">Selecione</option>
+            {turnosDisponiveis.map(turno => (
+              <option key={turno} value={turno}>{turno}</option>
             ))}
           </select>
         </div>
@@ -162,109 +188,113 @@ const dadosFiltrados = dados.filter(item =>
       <div className="filtros">
         <div className="filtro">
           <label>Dia da Semana</label>
-          <select name="curso" value={filtros.curso} onChange={handleFiltroChange}>
-            <option value="">Todos</option>
-            <option value="Segunda">Segunda</option>
-            <option value="Terça">Terça</option>
-            <option value="Quarta">Quarta</option>
-            <option value="Quinta">Quinta</option>
-            <option value="Sexta">Sexta</option>
-            <option value="Sábado">Sábado</option>
+          <select name="dia_semana" value={filtros.dia_semana} onChange={handleFiltroChange}>
+            <option value="">Selecione</option>
+            {diasDisponiveis.map(d => (
+              <option key={d} value={d}>{diasSemana.find(ds => String(ds.value) === String(d))?.label || d}</option>
+            ))}
           </select>
         </div>
-        <div className="filtro">
-  <label>Turno</label>
-  <select name="turno" value={filtros.turno} onChange={handleFiltroChange}>
-    <option value="">Todos</option>
-    <option value="Manhã">Manhã</option>
-    <option value="Tarde">Tarde</option>
-    <option value="Noite">Noite</option>
-  </select>
-</div>
-
-
-        
-
         <div className="filtro">
           <label>Horário</label>
           <select name="horario" value={filtros.horario} onChange={handleFiltroChange}>
-            <option value="">Todos</option>
-            {(filtros.turno ? horariosPorTurno[filtros.turno] : horarios).map(h => (
-  <option key={h} value={h}>{h}</option>
-))}
-
+            <option value="">Selecione</option>
+            {horariosDisponiveis.map(h => (
+              <option key={h} value={h}>{h}</option>
+            ))}
           </select>
         </div>
-
         <div className="filtro">
           <label>Tipo Sala</label>
-          <select name="tipoSala" value={filtros.tipoSala} onChange={handleFiltroChange}>
-            <option value="">Todas</option>
-            <option value="Laboratório">Laboratório</option>
-            <option value="Sala">Sala</option>
+          <select name="tipo_sala" value={filtros.tipo_sala} onChange={handleFiltroChange}>
+            <option value="">Selecione</option>
+            {tiposSala.map(t => (
+              <option key={t.value} value={t.value}>{t.label}</option>
+            ))}
+          </select>
+        </div>
+        <div className="filtro">
+          <label>Sala</label>
+          <select name="numero_sala" value={filtros.numero_sala} onChange={handleFiltroChange}>
+            <option value="">Selecione</option>
+            {salas.filter(s => !filtros.tipo_sala || s.tipo_sala === filtros.tipo_sala).map(s => (
+              <option key={s.numero_sala + '-' + s.tipo_sala} value={s.numero_sala}>{s.numero_sala}</option>
+            ))}
           </select>
         </div>
       </div>
 
-      {deveMostrarTabela && (
-        <table className="tabela">
-          <thead>
-            <tr>
-              <th>Sala</th>
-              <th>Tipo</th>
-              <th>Turno</th>
-              <th>Horário</th>
-              <th>Solicitar Reserva</th>
-            </tr>
-          </thead>
-          <tbody>
-            {dadosFiltrados.map((item, index) => (
-              <tr key={index}>
-                <td>{item.sala}</td>
-                <td>{item.tipoSala}</td>
-                <td>{item.turno}</td>
-                <td>{item.horario}</td>
-                <td>
-                  {reservados.includes(item) ? (
-                    <div style={{ backgroundColor: '#a8e6a3', padding: '4px 8px', borderRadius: '4px', textAlign: 'center' }}>
-                      Solicitado
-                    </div>
-                  ) : (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <input
-                        type="checkbox"
-                        style={{ width: '18px', height: '18px' }}
-                        checked={selecionado === item}
-                        onChange={() => handleSelecionar(item)}
-                      />
-                      {selecionado === item && (
-                        <button
-                          style={{ backgroundColor: 'red', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}
-                          onClick={handleConfirmar}
-                        >
-                          Confirmar
-                        </button>
-                      )}
-                    </div>
-                  )}
-                  {mostrarPopup && (
-  <div className="popup-overlay">
-    <div className="popup">
-      <h3>Confirmar Reserva</h3>
-      <p>Você deseja reservar a sala {linhaConfirmada.sala} ({linhaConfirmada.tipoSala}) no horário {linhaConfirmada.horario}?</p>
-      <div style={{ marginTop: '10px' }}>
-        <button onClick={confirmarReserva} style={{ marginRight: '10px', backgroundColor: 'green', color: 'white' }}>Sim</button>
-        <button onClick={() => setMostrarPopup(false)}>Cancelar</button>
-      </div>
-    </div>
-  </div>
-)}
+      <hr className="linha-separadora" />
 
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <table className="tabela">
+        <thead>
+          <tr>
+            <th>Sala</th>
+            <th>Tipo</th>
+            <th>Turno</th>
+            <th>Horário</th>
+            <th>Dia</th>
+            <th>Solicitar Reserva</th>
+          </tr>
+        </thead>
+        <tbody>
+          {linhasReserva.map((item, index) => (
+            <tr key={index}>
+              <td>{item.numero_sala}</td>
+              <td>{item.tipo_sala}</td>
+              <td>{item.turno}</td>
+              <td>{item.horario}</td>
+              <td>{diasSemana.find(d => String(d.value) === String(item.dia_semana))?.label || ''}</td>
+              <td>
+                {reservados.some(r => r.numero_sala === item.numero_sala && r.tipo_sala === item.tipo_sala && r.nome === item.nome && r.turno === item.turno && r.horario === item.horario && r.dia_semana === item.dia_semana) ? (
+                  <div style={{ backgroundColor: '#a8e6a3', padding: '4px 8px', borderRadius: '4px', textAlign: 'center' }}>
+                    Solicitado
+                  </div>
+                ) : (
+                  <button
+                    style={{ backgroundColor: 'red', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}
+                    onClick={() => handleConfirmar(item)}
+                  >
+                    Confirmar
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {mostrarPopup && linhaConfirmada && (
+        <div className="popup-overlay">
+          <div className="popup">
+            <h3>Confirmar Reserva</h3>
+            <p>Você deseja reservar a sala {linhaConfirmada.numero_sala} ({linhaConfirmada.tipo_sala}) no horário {linhaConfirmada.horario}?</p>
+            <div style={{ marginTop: '10px' }}>
+              <button onClick={confirmarReserva} style={{ marginRight: '10px', backgroundColor: 'green', color: 'white' }}>Sim</button>
+              <button onClick={() => setMostrarPopup(false)}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {mostrarConfirmacao && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          background: 'rgba(0,0,0,0.4)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{ background: 'white', padding: 32, borderRadius: 8, minWidth: 300, textAlign: 'center' }}>
+            <h3>Reserva realizada com sucesso!</h3>
+            <button onClick={() => setMostrarConfirmacao(false)} style={{ marginTop: 16, padding: '8px 24px', borderRadius: 4, background: '#4caf50', color: 'white', border: 'none', fontWeight: 'bold' }}>OK</button>
+          </div>
+        </div>
       )}
     </div>
   );

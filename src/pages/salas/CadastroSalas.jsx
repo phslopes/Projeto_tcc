@@ -6,18 +6,34 @@ function CadastroSalas({ onSave, onCancel, initialData }) {
 
   useEffect(() => {
     if (initialData) {
-      setNumber(initialData.number);
-      setType(initialData.type);
+      setNumber(initialData.number ? String(initialData.number) : "");
+      setType(initialData.type ? initialData.type.toLowerCase() : "");
+    } else {
+      // Limpa os campos quando não há initialData (novo cadastro)
+      setNumber("");
+      setType("");
     }
   }, [initialData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!number.trim() || !type.trim()) {
-      alert("Preencha todos os campos!");
+    
+    if (!number || number.trim() === "") {
+      alert("Preencha o número da sala!");
       return;
     }
-    onSave({ number, type });
+    
+    if (!type || type === "") {
+      alert("Selecione o tipo da sala!");
+      return;
+    }
+    
+    // Debug dos valores enviados
+    console.log("Enviando:", { number, type });
+    onSave({ 
+      number: parseInt(number), 
+      type: type.toLowerCase() 
+    });
   };
 
   return (
@@ -39,9 +55,11 @@ function CadastroSalas({ onSave, onCancel, initialData }) {
               type="text"
               value={number}
               inputMode="numeric"
-              onChange={(e) =>
-                setNumber(e.target.value.replace(/\D/g, ""))
-              }
+              onChange={(e) => {
+                // Garante que o campo nunca fique vazio ao editar
+                const value = e.target.value.replace(/\D/g, "");
+                setNumber(value);
+              }}
               placeholder="Número da sala"
               className="mt-1 p-2 border border-gray-300 rounded"
             />
@@ -55,14 +73,15 @@ function CadastroSalas({ onSave, onCancel, initialData }) {
               className="mt-1 p-2 border border-gray-300 rounded"
             >
               <option value="">Selecione o tipo</option>
-              <option value="Sala">Sala</option>
-              <option value="Laboratório">Laboratório</option>
+              <option value="sala">Sala</option>
+              <option value="laboratorio">Laboratório</option>
             </select>
           </label>
 
           <button
             type="submit"
-            className="w-full mt-2 bg-red-600 text-white py-2 rounded font-bold hover:bg-red-700 transition-all"
+            className="w-full mt-2 bg-red-600 text-white py-2 rounded font-bold hover:bg-red-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={!number || !type}
           >
             SALVAR
           </button>
