@@ -51,9 +51,9 @@ export default function Sidebar({ userRole }) {
                   Salas
                 </Link>
               </li>
-              <Link to="/admin/ProfessorDisc" className={linkClass("/admin/associacao-professor-disciplina")}>
+              <Link to="/admin/associacao" className={linkClass("/admin/associacao")}>
                   <MdLink size={20} /> 
-                  Professor/Disciplina
+                  Associação 
                 </Link>
               <li>
                 <Link to="/admin/alocacoes" className={linkClass("/admin/alocacoes")}>

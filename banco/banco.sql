@@ -71,5 +71,6 @@ CREATE TABLE alocacao (
     primary key (numero_sala,tipo_sala,id_professor, nome, turno, ano, semestre_alocacao)
 );
 
-INSERT INTO users (username, password, role) VALUES ('Andreia.machion@fatec.sp.gov.br', '$2b$10$lAfcLCdg5Fv51uZfUK0Mw.1A6URNbP82NXCdN2xVibrfdHRJL66D2', 'admin');
-INSERT INTO users (username, password, role) VALUES ('professor@Professor.com', '$2b$10$lAfcLCdg5Fv51uZfUK0Mw.1A6URNbP82NXCdN2xVibrfdHRJL66D2', 'professor');
+INSERT INTO users (username, password, role) VALUES ('Andreia.machion@fatec.sp.gov.br', '$2b$10$nHmQJ07.E2DWisCX9vHCWuto1goCeD/1kmW9tKPHl2dp49Hr/slqO', 'admin');
+INSERT INTO users (username, password, role) VALUES ('professor@Professor.com', 'professorfatec', 'professor');
+
