@@ -104,6 +104,12 @@ function AlocacoesPage() {
       alert("Vínculo Professor-Disciplina não encontrado. Verifique a associação.");
       return;
     }
+    
+    if (!vinculoExistente.dia_semana || !vinculoExistente.hora_inicio) {
+      alert("Vínculo Professor-Disciplina não possui dia da semana ou horário definido. Verifique a associação.");
+      return;
+    }
+    
     const [numero_sala_str, tipo_sala] = salaSelecionadaForm.split('|');
     const payload = {
         numero_sala: parseInt(numero_sala_str),
@@ -114,6 +120,8 @@ function AlocacoesPage() {
         ano: vinculoExistente.ano,
         semestre_alocacao: vinculoExistente.semestre_alocacao,
         tipo_alocacao: 'fixo',
+        dia_semana: vinculoExistente.dia_semana,
+        hora_inicio: vinculoExistente.hora_inicio
     };
     try {
       await api.post('/allocations', payload);
