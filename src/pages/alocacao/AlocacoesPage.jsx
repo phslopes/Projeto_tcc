@@ -1,344 +1,319 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import "./AlocacoesPage.css"; // Updated CSS import
+import "./AlocacoesPage.css";
+import { api } from "../../utils/api";
 
-const cursos = ["ADS", "Big Data", "Eventos"];
-const turnos = ["Manhã", "Vespertino", "Noturno"]; 
-const semestres = [1, 2, 3, 4, 5, 6];
-
-// Mock de Professor
-const todosProfessoresOriginal = ["Prof. Cachucho", "Prof. Aninha", "Prof. Levi", "Prof. Normie"];
-
-// Mock Disciplina
-const todasDisciplinas = [
-  { nome: "Matemática Cachuche", curso: "ADS", turno: "Noturno", semestre: 1 },
-  { nome: "Engenharia de festa", curso: "Eventos", turno: "Manhã", semestre: 2 },
-  { nome: "Power BI sei la", curso: "Big Data", turno: "Manhã", semestre: 3 },
-  { nome: "Engenharia de Software", curso: "ADS", turno: "Noturno", semestre: 3 },
-  { nome: "Banco de Dados", curso: "ADS", turno: "Noturno", semestre: 2 },
-];
-const todasSalas = ["S01", "S02", "S03", "L01", "L02", "Auditório A"];
-
-const professorDisciplinaVinculos = [
-  { disciplinaKey: { nome: "Matemática Cachuche", curso: "ADS", turno: "Noturno", semestre: 1 }, professorNome: "Prof. Cachucho" },
-  { disciplinaKey: { nome: "Engenharia de festa", curso: "Eventos", turno: "Manhã", semestre: 2 }, professorNome: "Prof. Aninha" },
-  { disciplinaKey: { nome: "Power BI sei la", curso: "Big Data", turno: "Manhã", semestre: 3 }, professorNome: "Prof. Levi" }, 
-  { disciplinaKey: { nome: "Engenharia de Software", curso: "ADS", turno: "Noturno", semestre: 3 }, professorNome: "Prof. Normie" }, 
-  { disciplinaKey: { nome: "Banco de Dados", curso: "ADS", turno: "Noturno", semestre: 2 }, professorNome: "Prof. Cachucho" }, 
-
+const diasSemanaConst = [
+    { value: 2, label: 'Segunda-feira' },
+    { value: 3, label: 'Terça-feira' },
+    { value: 4, label: 'Quarta-feira' },
+    { value: 5, label: 'Quinta-feira' },
+    { value: 6, label: 'Sexta-feira' },
+    { value: 7, label: 'Sábado' },
 ];
 
-export default function AlocacoesPage() { // Renamed component
-  const [cursoFiltro, setCursoFiltro] = useState(""); 
-  const [turnoFiltro, setTurnoFiltro] = useState(""); 
-  const [semestreFiltro, setSemestreFiltro] = useState(""); 
+function AlocacoesPage() {
+  const [alocacoesExibidas, setAlocacoesExibidas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Estado para o formulário de nova associação
-  const [disciplinaSelecionada, setDisciplinaSelecionada] = useState("");
-  const [professorAutoPreenchido, setProfessorAutoPreenchido] = useState(""); // professor read-only
-  const [salaSelecionada, setSalaSelecionada] = useState("");
+  const [disciplinas, setDisciplinas] = useState([]);
+  const [salas, setSalas] = useState([]);
+  const [vinculosProfessorDisciplina, setVinculosProfessorDisciplina] = useState([]);
 
-  // Estado original das associações (alocações)
-  const [associacoes, setAssociacoes] = useState([
-    { disciplina: "Matemática Cachuche", professor: "Prof. Cachucho", sala: "S01" },
-    { disciplina: "Engenharia de festa", professor: "Prof. Aninha", sala: "L01" },
-  ]);
+  const [filtroCurso, setFiltroCurso] = useState("");
+  const [filtroTurno, setFiltroTurno] = useState("");
+  const [filtroSemestreCurso, setFiltroSemestreCurso] = useState("");
+
+  const [disciplinaSelecionadaForm, setDisciplinaSelecionadaForm] = useState("");
+  const [professorAutoPreenchidoNome, setProfessorAutoPreenchidoNome] = useState("");
+  const [professorAutoPreenchidoId, setProfessorAutoPreenchidoId] = useState("");
+  const [salaSelecionadaForm, setSalaSelecionadaForm] = useState("");
+  const [diaSemanaForm, setDiaSemanaForm] = useState("");
+  const [horaInicioForm, setHoraInicioForm] = useState("");
 
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editingAssociation, setEditingAssociation] = useState(null); 
-  
-  // Estados para o modal de edição
-  const [editedDisciplina, setEditedDisciplina] = useState(""); // Mantém o nome da disciplina
-  const [editedProfessorAutoPreenchido, setEditedProfessorAutoPreenchido] = useState("");
-  const [editedSala, setEditedSala] = useState("");
+  const [editingAlocacao, setEditingAlocacao] = useState(null);
+  const [newlySelectedRoom, setNewlySelectedRoom] = useState("");
 
-  // Lógica de filtragem original
-  const disciplinasFiltradasParaNovo = todasDisciplinas.filter(
-    (d) =>
-      (!cursoFiltro || d.curso === cursoFiltro) &&
-      (!turnoFiltro || d.turno === turnoFiltro) &&
-      (!semestreFiltro || d.semestre === parseInt(semestreFiltro))
-  );
+  const fetchAlocacoes = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const fetched = await api.get('/allocations', {});
+      setAlocacoesExibidas(fetched);
+    } catch (err) {
+      setError(err.message || 'Erro ao carregar alocações.');
+      setAlocacoesExibidas([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  // Efeito para auto-preencher professor no formulário principal
+  const fetchDropdownData = useCallback(async () => {
+    try {
+      const [discs, rooms, profDiscs] = await Promise.all([
+        api.get('/disciplines'),
+        api.get('/rooms'),
+        api.get('/professor-disciplines')
+      ]);
+      setDisciplinas(discs);
+      setSalas(rooms);
+      setVinculosProfessorDisciplina(profDiscs);
+    } catch (err) {
+      console.error("Erro ao carregar dados para dropdowns:", err);
+    }
+  }, []);
+
   useEffect(() => {
-    if (disciplinaSelecionada) {
-      const discObj = todasDisciplinas.find(d => d.nome === disciplinaSelecionada);
-      if (discObj) {
-        const vinculo = professorDisciplinaVinculos.find(v =>
-          v.disciplinaKey.nome === discObj.nome &&
-          v.disciplinaKey.curso === discObj.curso &&
-          v.disciplinaKey.turno === discObj.turno &&
-          v.disciplinaKey.semestre === discObj.semestre
-        );
-        setProfessorAutoPreenchido(vinculo ? vinculo.professorNome : "Vínculo não encontrado");
+    fetchAlocacoes();
+    fetchDropdownData();
+  }, [fetchAlocacoes, fetchDropdownData]);
+  
+  useEffect(() => {
+    if (disciplinaSelecionadaForm) {
+      const [discNome, discTurno] = disciplinaSelecionadaForm.split('|');
+      const vinculo = vinculosProfessorDisciplina.find(v => v.disciplina_nome === discNome && v.disciplina_turno === discTurno);
+      if (vinculo) {
+        setProfessorAutoPreenchidoNome(vinculo.professor_nome);
+        setProfessorAutoPreenchidoId(vinculo.id_professor);
+        setDiaSemanaForm(vinculo.dia_semana ? String(vinculo.dia_semana) : '');
+        setHoraInicioForm(vinculo.hora_inicio ? vinculo.hora_inicio.substring(0, 5) : '');
       } else {
-        setProfessorAutoPreenchido("");
+        setProfessorAutoPreenchidoNome("Vínculo não encontrado");
+        setProfessorAutoPreenchidoId("");
+        setDiaSemanaForm("");
+        setHoraInicioForm("");
       }
     } else {
-      setProfessorAutoPreenchido("");
+      setProfessorAutoPreenchidoNome("");
+      setProfessorAutoPreenchidoId("");
+      setDiaSemanaForm("");
+      setHoraInicioForm("");
     }
-  }, [disciplinaSelecionada]);
+  }, [disciplinaSelecionadaForm, vinculosProfessorDisciplina]);
 
-  // Efeito para auto-preencher professor no modal de edição
-  useEffect(() => {
-    if (showEditModal && editingAssociation && editedDisciplina) {
-      const discObj = todasDisciplinas.find(d => d.nome === editedDisciplina);
-      if (discObj) {
-        const vinculo = professorDisciplinaVinculos.find(v =>
-          v.disciplinaKey.nome === discObj.nome &&
-          v.disciplinaKey.curso === discObj.curso &&
-          v.disciplinaKey.turno === discObj.turno &&
-          v.disciplinaKey.semestre === discObj.semestre
-        );
-        setEditedProfessorAutoPreenchido(vinculo ? vinculo.professorNome : "Vínculo não encontrado");
-      } else {
-        setEditedProfessorAutoPreenchido("");
-      }
-    } else if (!showEditModal) {
-        setEditedProfessorAutoPreenchido(""); // Limpa quando o modal fecha
-    }
-  }, [editedDisciplina, showEditModal, editingAssociation]);
-
-
-  const associar = () => {
-    if (!disciplinaSelecionada || !professorAutoPreenchido || !salaSelecionada || professorAutoPreenchido === "Vínculo não encontrado") {
-      alert("Selecione a disciplina (verifique o vínculo do professor) e a sala.");
+  const handleAssociarAlocacao = async () => {
+    if (!disciplinaSelecionadaForm || !professorAutoPreenchidoId || !salaSelecionadaForm) {
+      alert("Por favor, preencha todos os campos obrigatórios para a alocação.");
       return;
     }
-
-    const jaExiste = associacoes.some(
-      (a) =>
-        a.disciplina === disciplinaSelecionada &&
-        a.professor === professorAutoPreenchido && // Usa o professor auto-preenchido
-        a.sala === salaSelecionada
-    );
-
-    if (jaExiste) {
-      alert("Essa alocação (Disciplina, Professor, Sala) já existe.");
+    const [nomeDisc, turnoDisc] = disciplinaSelecionadaForm.split('|');
+    const vinculoExistente = vinculosProfessorDisciplina.find(v => v.id_professor === professorAutoPreenchidoId && v.disciplina_nome === nomeDisc && v.disciplina_turno === turnoDisc);
+    if (!vinculoExistente) {
+      alert("Vínculo Professor-Disciplina não encontrado. Verifique a associação.");
       return;
     }
-
-    setAssociacoes([
-      ...associacoes,
-      {
-        disciplina: disciplinaSelecionada,
-        professor: professorAutoPreenchido, 
-        sala: salaSelecionada,
-      },
-    ]);
-    setDisciplinaSelecionada("");
-    setSalaSelecionada("");
+    
+    if (!vinculoExistente.dia_semana || !vinculoExistente.hora_inicio) {
+      alert("Vínculo Professor-Disciplina não possui dia da semana ou horário definido. Verifique a associação.");
+      return;
+    }
+    
+    const [numero_sala_str, tipo_sala] = salaSelecionadaForm.split('|');
+    const payload = {
+        numero_sala: parseInt(numero_sala_str),
+        tipo_sala: tipo_sala,
+        id_professor: professorAutoPreenchidoId,
+        nome: nomeDisc,
+        turno: turnoDisc,
+        ano: vinculoExistente.ano,
+        semestre_alocacao: vinculoExistente.semestre_alocacao,
+        tipo_alocacao: 'fixo',
+        dia_semana: vinculoExistente.dia_semana,
+        hora_inicio: vinculoExistente.hora_inicio
+    };
+    try {
+      await api.post('/allocations', payload);
+      alert('Alocação criada com sucesso!');
+      setDisciplinaSelecionadaForm("");
+      setSalaSelecionadaForm("");
+      fetchAlocacoes(); 
+    } catch (err) {
+      console.error("Erro ao associar/alocar:", err);
+      alert(err.message || "Ocorreu um erro ao criar alocação.");
+    }
   };
-
-  const handleEdit = (index) => {
-    const assoc = associacoes[index];
-    setEditingAssociation({ ...assoc, index }); 
-    setEditedDisciplina(assoc.disciplina);
-    setEditedSala(assoc.sala);
+  
+  const handleEditarAlocacao = (alocacao) => {
+    setEditingAlocacao(alocacao);
+    setNewlySelectedRoom("");
     setShowEditModal(true);
   };
 
   const handleCloseEditModal = () => {
     setShowEditModal(false);
-    setEditingAssociation(null);
-    setEditedDisciplina("");
-    // setEditedProfessorAutoPreenchido(""); // Será limpo pelo useEffect
-    setEditedSala("");
+    setEditingAlocacao(null);
+    setNewlySelectedRoom("");
   };
 
-  const handleSaveEdit = () => {
-    if (!editedDisciplina || !editedProfessorAutoPreenchido || !editedSala || editedProfessorAutoPreenchido === "Vínculo não encontrado") {
-      alert("Disciplina (verifique o vínculo do professor) e Sala não podem ser vazios na edição.");
+  const handleSaveRoomChange = async () => {
+    if (!editingAlocacao || !newlySelectedRoom) {
+      alert("Por favor, selecione uma nova sala.");
       return;
     }
 
-    const jaExiste = associacoes.some(
-      (a, i) =>
-        i !== editingAssociation.index &&
-        a.disciplina === editedDisciplina &&
-        a.professor === editedProfessorAutoPreenchido && 
-        a.sala === editedSala
-    );
+    const [new_numero_sala, new_tipo_sala] = newlySelectedRoom.split('|');
+    const { numero_sala, tipo_sala, id_professor, disciplina_nome, disciplina_turno, ano, semestre_alocacao } = editingAlocacao;
 
-    if (jaExiste) {
-      alert("Essa combinação de Disciplina, Professor e Sala já existe em outra alocação.");
-      return;
-    }
-
-    const updatedAssociacoes = [...associacoes];
-    updatedAssociacoes[editingAssociation.index] = {
-      disciplina: editedDisciplina,
-      professor: editedProfessorAutoPreenchido, 
-      sala: editedSala,
-    };
-    setAssociacoes(updatedAssociacoes);
-    handleCloseEditModal();
-  };
-
-  const handleDelete = (index) => {
-    if (confirm("Tem certeza que deseja excluir esta alocação?")) {
-      const novasAssociacoes = associacoes.filter((_, i) => i !== index);
-      setAssociacoes(novasAssociacoes);
+    try {
+      await api.put(
+        `/allocations/change-room/${numero_sala}/${tipo_sala}/${id_professor}/${disciplina_nome}/${disciplina_turno}/${ano}/${semestre_alocacao}`,
+        { new_numero_sala: parseInt(new_numero_sala), new_tipo_sala }
+      );
+      alert('Sala da alocação alterada com sucesso!');
+      handleCloseEditModal();
+      fetchAlocacoes();
+    } catch (err) {
+      console.error("Erro ao alterar sala da alocação:", err);
+      alert(err.message || "Ocorreu um erro ao tentar alterar a sala.");
     }
   };
+
+  const handleExcluirAlocacao = async (alocacaoParaExcluir) => {
+    if (window.confirm("Tem certeza que deseja excluir esta alocação?")) {
+      try {
+        const { numero_sala, tipo_sala, id_professor, disciplina_nome, disciplina_turno, ano, semestre_alocacao } = alocacaoParaExcluir;
+        await api.delete(`/allocations/${numero_sala}/${tipo_sala}/${id_professor}/${disciplina_nome}/${disciplina_turno}/${ano}/${semestre_alocacao}`);
+        alert('Alocação excluída com sucesso!');
+        fetchAlocacoes();
+      } catch (err) {
+        alert(err.message || "Erro ao excluir alocação.");
+      }
+    }
+  };
+
+  if (loading) {
+    return <div className="container-alocacoes"><p>Carregando...</p></div>;
+  }
+  if (error) {
+    return <div className="container-alocacoes"><p className="text-red-500">Erro: {error}</p></div>;
+  }
+
+  const cursosUnicos = [...new Set(disciplinas.map(d => d.curso))];
+  const turnosDisciplinasUnicos = [...new Set(disciplinas.map(d => d.turno))];
+  const semestresCursoUnicos = [...new Set(disciplinas.map(d => d.semestre_curso))].sort((a,b) => a-b);
+  const disciplinasFiltradasParaForm = disciplinas.filter(
+    (d) =>
+      (!filtroCurso || d.curso === filtroCurso) &&
+      (!filtroTurno || d.turno === filtroTurno) &&
+      (!filtroSemestreCurso || d.semestre_curso === parseInt(filtroSemestreCurso))
+  );
 
   return (
     <div className="container-alocacoes">
-      <h2>Alocação: Disciplina, Professor e Sala</h2>
+      <div className="header-alocacoes">
+        <h2>Lista de Alocações</h2>
+      </div>
 
-      <div className="filtros-alocacao"> {/* Corrected class name */}
+      <div className="filtros-alocacoes">
         <label>
           Curso:
-          <select value={cursoFiltro} onChange={(e) => setCursoFiltro(e.target.value)}>
+          <select value={filtroCurso} onChange={(e) => setFiltroCurso(e.target.value)}>
             <option value="">Todos</option>
-            {cursos.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
+            {cursosUnicos.map((c) => (<option key={c} value={c}>{c}</option>))}
           </select>
         </label>
         <label>
           Turno:
-          <select value={turnoFiltro} onChange={(e) => setTurnoFiltro(e.target.value)}>
+          <select value={filtroTurno} onChange={(e) => setFiltroTurno(e.target.value)}>
             <option value="">Todos</option>
-            {turnos.map((t) => ( 
-              <option key={t} value={t}>{t}</option>
-            ))}
+            {turnosDisciplinasUnicos.map((t) => (<option key={t} value={t}>{t}</option>))}
           </select>
         </label>
         <label>
           Semestre:
-          <select value={semestreFiltro} onChange={(e) => setSemestreFiltro(e.target.value)}>
+          <select value={filtroSemestreCurso} onChange={(e) => setFiltroSemestreCurso(e.target.value)}>
             <option value="">Todos</option>
-            {semestres.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
+            {semestresCursoUnicos.map((s) => (<option key={s} value={s}>{s}º</option>))}
           </select>
         </label>
       </div>
 
-      <div className="form-alocacao"> {/* Corrected class name */}
+      <div className="form-associacao-alocacao">
         <label>
           Disciplina:
-          <select
-            value={disciplinaSelecionada}
-            onChange={(e) => setDisciplinaSelecionada(e.target.value)}
-          >
+          <select value={disciplinaSelecionadaForm} onChange={(e) => setDisciplinaSelecionadaForm(e.target.value)}>
             <option value="">Selecione</option>
-            {disciplinasFiltradasParaNovo.map((d) => (
-              <option key={d.nome} value={d.nome}> 
-                {d.nome} ({d.curso} - Sem: {d.semestre} - {d.turno})
+            {disciplinasFiltradasParaForm.map((d) => (
+              <option key={`${d.nome}|${d.turno}`} value={`${d.nome}|${d.turno}`}>
+                {d.nome} ({d.curso} - Sem: {d.semestre_curso} - {d.turno})
               </option>
             ))}
           </select>
         </label>
-
         <label>
           Professor:
-          <input
-            type="text"
-            value={professorAutoPreenchido}
-            readOnly
-            placeholder="Selecione uma disciplina"
-            className="readonly-input-alocacao" // Corrected class name
-            style={{backgroundColor: '#e9ecef', cursor: 'default', padding: '0.6rem', border: '1px solid #ccc', borderRadius: '4px', width: '100%', marginTop: '0.4rem'}} 
-          />
+          <input type="text" value={professorAutoPreenchidoNome} readOnly className="readonly-input-alocacao" />
         </label>
-
+        <label>
+          Dia da Semana:
+          <input type="text" value={diaSemanaForm ? diasSemanaConst.find(d => d.value === parseInt(diaSemanaForm))?.label : ''} readOnly className="readonly-input-alocacao" />
+        </label>
+        <label>
+          Horário:
+          <input type="text" value={horaInicioForm} readOnly className="readonly-input-alocacao" />
+        </label>
         <label>
           Sala:
-          <select
-            value={salaSelecionada}
-            onChange={(e) => setSalaSelecionada(e.target.value)}
-          >
+          <select value={salaSelecionadaForm} onChange={(e) => setSalaSelecionadaForm(e.target.value)}>
             <option value="">Selecione</option>
-            {todasSalas.map((s) => (
-              <option key={s} value={s}>{s}</option>
+            {salas.map((s) => (
+              <option key={`${s.numero_sala}-${s.tipo_sala}`} value={`${s.numero_sala}|${s.tipo_sala}`}>
+                {s.tipo_sala === 'sala' ? 'Sala ' : 'Lab '}{s.numero_sala}
+              </option>
             ))}
           </select>
         </label>
-
-        <button className="btn-alocar" onClick={associar}>ASSOCIAR</button> {/* Corrected class name */}
+        <button className="btn-associar-alocacao" onClick={handleAssociarAlocacao}>ALOCAR</button>
       </div>
 
-      <table className="table-alocacoes"> {/* Corrected class name */}
+      <table className="table-alocacoes">
         <thead>
           <tr>
-            <th>Disciplina</th>
-            <th>Professor</th>
-            <th>Sala</th>
-            <th>Ações</th>
+            <th>Disciplina</th><th>Professor</th><th>Sala</th><th>Status</th>
+            <th>Ano</th><th>Semestre</th><th>Dia</th><th>Horário</th><th>Ações</th>
           </tr>
         </thead>
         <tbody>
-          {associacoes.map((a, i) => ( // 'i' como key se não houver ID único na associação original
-            <tr key={i}> 
-              <td>{a.disciplina}</td>
-              <td>{a.professor}</td>
-              <td>{a.sala}</td>
+          {alocacoesExibidas.map((alocacao) => (
+            <tr key={`${alocacao.numero_sala}-${alocacao.tipo_sala}-${alocacao.id_professor}-${alocacao.disciplina_nome}-${alocacao.disciplina_turno}-${alocacao.ano}-${alocacao.semestre_alocacao}`}>
+              <td>{alocacao.disciplina_nome}</td><td>{alocacao.professor_nome}</td>
+              <td>{alocacao.tipo_sala === 'sala' ? 'Sala ' : 'Lab '}{alocacao.numero_sala}</td>
+              <td>{alocacao.alocacao_status}</td><td>{alocacao.ano}</td>
+              <td>{alocacao.semestre_alocacao}</td>
+              <td>{diasSemanaConst.find(d => d.value === alocacao.dia_semana)?.label || ''}</td>
+              <td>{alocacao.hora_inicio ? alocacao.hora_inicio.substring(0, 5) : ''}</td>
               <td className="coluna-acoes">
-                <button onClick={() => handleEdit(i)} className="btn-acao-edit">
-                  <FaEdit />
-                </button>
-                <button onClick={() => handleDelete(i)} className="btn-acao-delete">
-                  <FaTrash />
-                </button>
+                <button className="btn-acao-edit" onClick={() => handleEditarAlocacao(alocacao)}><FaEdit /></button>
+                <button className="btn-acao-delete" onClick={() => handleExcluirAlocacao(alocacao)}><FaTrash /></button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-
-      {showEditModal && editingAssociation && (
-        <div className="modal-alocacao-overlay"> {/* Corrected class name */}
-          <div className="modal-alocacao-content"> {/* Corrected class name */}
-            <button className="modal-alocacao-close-btn" onClick={handleCloseEditModal}> {/* Corrected class name */}
-              &times;
-            </button>
-            <h3>Editar Alocação</h3>
-            <div className="form-edit-alocacao"> {/* Corrected class name */}
+      
+      {showEditModal && editingAlocacao && (
+        <div className="modal-alocacoes-overlay">
+          <div className="modal-alocacoes-content">
+            <button className="modal-alocacoes-close-btn" onClick={handleCloseEditModal}>&times;</button>
+            <h3>Alterar Sala da Alocação</h3>
+            <p className="readonly-input-alocacao-modal" style={{textAlign: 'center', marginBottom: '1rem'}}>
+                {`${editingAlocacao.disciplina_nome} - ${editingAlocacao.professor_nome}`}
+            </p>
+            <div className="form-edit-alocacao-modal">
               <label>
-                Disciplina:
-                <select
-                  value={editedDisciplina}
-                  onChange={(e) => setEditedDisciplina(e.target.value)}
-                >
-                  <option value="">Selecione uma disciplina</option>
-                  {todasDisciplinas.map((d) => (
-                    <option key={d.nome} value={d.nome}>
-                      {d.nome} ({d.curso} - Sem: {d.semestre} - {d.turno})
+                Nova Sala:
+                <select value={newlySelectedRoom} onChange={(e) => setNewlySelectedRoom(e.target.value)}>
+                  <option value="">Selecione a nova sala</option>
+                  {salas.map(s => (
+                    <option key={`${s.numero_sala}-${s.tipo_sala}`} value={`${s.numero_sala}|${s.tipo_sala}`}>
+                      {s.tipo_sala === 'sala' ? 'Sala ' : 'Lab '}{s.numero_sala}
                     </option>
                   ))}
                 </select>
               </label>
-              <label>
-                Professor:
-                <input
-                  type="text"
-                  value={editedProfessorAutoPreenchido}
-                  readOnly
-                  placeholder="Selecione uma disciplina"
-                  className="readonly-input-alocacao-modal" // Corrected class name
-                  style={{backgroundColor: '#e9ecef', cursor: 'default', width: '100%', padding: '0.6rem', border: '1px solid #ccc', borderRadius: '4px', marginTop: '0.5rem', marginBottom: '1rem'}} 
-                />
-              </label>
-              <label>
-                Sala:
-                <select
-                  value={editedSala}
-                  onChange={(e) => setEditedSala(e.target.value)}
-                >
-                  <option value="">Selecione uma sala</option>
-                  {todasSalas.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button className="btn-salvar-edicao" onClick={handleSaveEdit}>
-                SALVAR ALTERAÇÕES
-              </button>
+              <button className="btn-salvar-edicao" onClick={handleSaveRoomChange}>SALVAR ALTERAÇÃO</button>
             </div>
           </div>
         </div>
@@ -346,3 +321,5 @@ export default function AlocacoesPage() { // Renamed component
     </div>
   );
 }
+
+export default AlocacoesPage;

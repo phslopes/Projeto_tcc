@@ -1,4 +1,6 @@
-.container-alocacoes { /* Renamed class */
+/* src/pages/alocacao/AlocacoesPage.css */
+
+.container-alocacoes { /* Renamed from .container-profdisc */
   padding: 2rem;
   font-family: Arial, sans-serif;
 }
@@ -9,26 +11,26 @@ h2 {
   margin-bottom: 1.5rem;
 }
 
-.filtros-alocacao { 
+.filtros-alocacoes { /* Renamed from .filtros-profdisc */
   display: flex;
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
-.filtros-alocacao label { 
+.filtros-alocacoes label { /* Renamed from .filtros-profdisc label */
   display: flex;
   flex-direction: column;
   font-size: 0.9rem;
 }
 
-.filtros-alocacao select { 
+.filtros-alocacoes select { /* Renamed from .filtros-profdisc select */
   margin-top: 0.4rem;
   padding: 0.4rem;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
-.form-alocacao { 
+.form-associacao-alocacao { /* Renamed from .form-associacao to reflect purpose in AlocacoesPage */
   display: flex;
   gap: 1.5rem; 
   align-items: flex-end; 
@@ -36,7 +38,7 @@ h2 {
   margin-bottom: 2rem;
 }
 
-.form-alocacao label {
+.form-associacao-alocacao label { /* Renamed from .form-associacao label */
   display: flex;
   flex-direction: column;
   font-size: 0.9rem;
@@ -44,7 +46,8 @@ h2 {
   min-width: 150px; 
 }
 
-.form-alocacao select { 
+.form-associacao-alocacao select,
+.form-associacao-alocacao input[type="text"] { /* Added input[type="text"] */
   margin-top: 0.4rem;
   padding: 0.6rem; 
   border-radius: 4px;
@@ -52,7 +55,7 @@ h2 {
   width: 100%;
 }
 
-.btn-alocar { 
+.btn-associar-alocacao { /* Renamed from .btn-associar */
   height: auto; 
   padding: 0.65rem 1.2rem; 
   background-color: #b20000;
@@ -64,11 +67,11 @@ h2 {
   white-space: nowrap; 
 }
 
-.btn-alocar:hover { 
+.btn-associar-alocacao:hover { /* Renamed from .btn-associar:hover */
   background-color: #8c0000;
 }
 
-.table-alocacoes { 
+.table-alocacoes { /* Renamed from .table-associacoes */
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
@@ -76,20 +79,20 @@ h2 {
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.table-alocacoes th, 
-.table-alocacoes td { 
+.table-alocacoes th,
+.table-alocacoes td {
   padding: 0.75rem 1rem;
   border-bottom: 1px solid #eee;
   text-align: left;
 }
 
-.table-alocacoes th { 
+.table-alocacoes th {
   background: #f9f9f9;
   color: #444;
 }
 
-.table-alocacoes th:last-child, 
-.table-alocacoes td:last-child { 
+.table-alocacoes th:last-child,
+.table-alocacoes td:last-child {
   text-align: center;
 }
 
@@ -126,7 +129,8 @@ h2 {
   transform: scale(1.8);
 }
 
-.modal-alocacao-overlay { 
+/* Modal styles for editing (if needed, this was part of original ProfDiscPage.css) */
+.modal-alocacoes-overlay { /* Renamed from .modal-profdisc-overlay */
   position: fixed;
   top: 0;
   left: 0;
@@ -139,7 +143,7 @@ h2 {
   z-index: 1000;
 }
 
-.modal-alocacao-content { 
+.modal-alocacoes-content { /* Renamed from .modal-profdisc-content */
   background-color: white;
   padding: 2.5rem;
   border-radius: 8px;
@@ -155,7 +159,7 @@ h2 {
   to { opacity: 1; transform: translateY(0); }
 }
 
-.modal-alocacao-close-btn { 
+.modal-alocacoes-close-btn { /* Renamed from .modal-profdisc-close-btn */
   position: absolute;
   top: 1rem;
   right: 1.5rem;
@@ -166,11 +170,11 @@ h2 {
   border: none;
   cursor: pointer;
 }
-.modal-alocacao-close-btn:hover { 
+.modal-alocacoes-close-btn:hover { /* Renamed from .modal-profdisc-close-btn:hover */
   color: #000;
 }
 
-.modal-alocacao-content h3 { 
+.modal-alocacoes-content h3 { /* Renamed from .modal-profdisc-content h3 */
   font-size: 1.4rem;
   font-weight: bold;
   margin-bottom: 1.5rem;
@@ -178,7 +182,7 @@ h2 {
   color: #333;
 }
 
-.form-edit-alocacao label { 
+.form-edit-alocacao-modal label { /* Renamed from .form-edit-associacao label */
   display: flex;
   flex-direction: column;
   font-size: 0.9rem;
@@ -186,7 +190,7 @@ h2 {
   color: #444;
 }
 
-.form-edit-alocacao select { 
+.form-edit-alocacao-modal select { /* Renamed from .form-edit-associacao select */
   margin-top: 0.5rem;
   padding: 0.6rem;
   border-radius: 4px;
@@ -213,7 +217,7 @@ h2 {
   background-color: #530301;
 }
 
-.readonly-input-alocacao { 
+.readonly-input-alocacao { /* Renamed from .readonly-input-profdisc */
   background-color: #e9ecef;
   cursor: default;
   padding: 0.6rem;
@@ -223,7 +227,7 @@ h2 {
   margin-top: 0.4rem;
 }
 
-.readonly-input-alocacao-modal { 
+.readonly-input-alocacao-modal { /* Renamed from .readonly-input-profdisc-modal */
   background-color: #e9ecef;
   cursor: default;
   width: 100%;

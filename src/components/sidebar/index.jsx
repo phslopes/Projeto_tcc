@@ -1,7 +1,7 @@
 import { useLocation, Link } from "react-router-dom";
 import { IoHomeOutline } from "react-icons/io5";
 import { MdOutlineDashboard, MdLink } from "react-icons/md";
-import { FaChalkboardTeacher, FaBook, FaDoorOpen, FaCalendarAlt, FaRegCalendarCheck  } from "react-icons/fa";
+import { FaChalkboardTeacher, FaBook, FaDoorOpen, FaCalendarAlt, FaRegCalendarCheck } from "react-icons/fa";
 import { useState } from "react";
 import { FaChartBar } from "react-icons/fa";
 
@@ -14,7 +14,7 @@ export default function Sidebar({ userRole }) {
     }`;
 
   return (
-    
+
     <aside className="w-60 h-screen bg-gray-100 text-gray-800 p-4 rounded-lg shadow divide-y divide-gray-300">
       {/* Header */}
       <header className="pb-4 mb-4">
@@ -52,13 +52,19 @@ export default function Sidebar({ userRole }) {
                 </Link>
               </li>
               <Link to="/admin/associacao" className={linkClass("/admin/associacao")}>
-                  <MdLink size={20} /> 
-                  Associação 
-                </Link>
+                <MdLink size={20} />
+                Associação
+              </Link>
               <li>
                 <Link to="/admin/alocacoes" className={linkClass("/admin/alocacoes")}>
                   <FaRegCalendarCheck size={20} />
                   Alocações
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin/reservaAdmin" className={linkClass("/admin/reservaAdmin")}>
+                  <FaCalendarAlt size={20} />
+                  Reserva
                 </Link>
               </li>
             </>
