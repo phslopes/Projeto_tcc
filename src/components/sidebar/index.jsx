@@ -1,28 +1,23 @@
 import { useLocation, Link } from "react-router-dom";
-import { IoHomeOutline } from "react-icons/io5";
+import { IoHomeOutline } from "react-icons/io5"; // Não está sendo usado, pode remover se quiser
 import { MdOutlineDashboard, MdLink } from "react-icons/md";
-import { FaChalkboardTeacher, FaBook, FaDoorOpen, FaCalendarAlt, FaRegCalendarCheck } from "react-icons/fa";
-import { useState } from "react";
-import { FaChartBar } from "react-icons/fa";
-
+import { FaChalkboardTeacher, FaBook, FaDoorOpen, FaCalendarAlt, FaRegCalendarCheck, FaOutdent, FaSignOutAlt, FaChartBar } from "react-icons/fa";
 
 export default function Sidebar({ userRole }) {
   const location = useLocation();
 
   const linkClass = (path) =>
-    `flex items-center gap-2 p-2 rounded hover:bg-gray-200 ${location.pathname === path ? "bg-gray-300" : ""
-    }`;
+    `flex items-center gap-2 p-2 rounded-lg hover:bg-gray-200 transition-colors duration-200 
+    ${location.pathname === path ? "bg-blue-100 text-blue-700 font-semibold" : "text-gray-800"}`;
 
   return (
 
-    <aside className="w-60 h-screen bg-gray-100 text-gray-800 p-4 rounded-lg shadow divide-y divide-gray-300">
-      {/* Header */}
-      <header className="pb-4 mb-4">
-        <h2 className="text-xl font-bold">Sistema de Horários</h2>
+    <aside className="w-60 h-screen bg-gray-100 text-gray-800 p-4 rounded-lg shadow-lg flex flex-col">
+      <header className="pb-4 mb-4 border-b border-gray-300">
+        <h2 className="text-2xl font-bold text-gray-900">Sistema de Horários</h2>
       </header>
 
-      {/* Navegação */}
-      <nav className="space-y-4 flex-1">
+      <nav className="flex-grow space-y-2 py-2"> 
         <ul className="space-y-2">
 
           {userRole === "admin" ? (
@@ -30,7 +25,7 @@ export default function Sidebar({ userRole }) {
               <li>
                 <Link to="/admin" className={linkClass("/admin")}>
                   <MdOutlineDashboard size={20} />
-                  Inicio
+                  Início
                 </Link>
               </li>
               <li>
@@ -51,10 +46,12 @@ export default function Sidebar({ userRole }) {
                   Salas
                 </Link>
               </li>
-              <Link to="/admin/associacao" className={linkClass("/admin/associacao")}>
-                <MdLink size={20} />
-                Associação
-              </Link>
+              <li> {/* Cada Link deve estar dentro de um <li> para melhor semântica */}
+                <Link to="/admin/associacao" className={linkClass("/admin/associacao")}>
+                  <MdLink size={20} />
+                  Associação
+                </Link>
+              </li>
               <li>
                 <Link to="/admin/alocacoes" className={linkClass("/admin/alocacoes")}>
                   <FaRegCalendarCheck size={20} />
@@ -78,6 +75,13 @@ export default function Sidebar({ userRole }) {
           )}
         </ul>
       </nav>
+
+      <div className="mt-auto pt-4 border-t border-gray-300">
+        <Link to="/" className={linkClass("/")}>
+          <FaSignOutAlt size={20} />
+          Sair
+        </Link>
+      </div>
     </aside>
   );
 }

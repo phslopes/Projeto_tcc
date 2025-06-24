@@ -118,12 +118,12 @@ export default function AlocacaoFIltro() {
         <tbody>
           {dadosFiltrados.map((item, index) => (
             <tr key={`mock-${item.numero_sala}-${item.tipo_sala}-${item.id_professor}-${item.nome || item.disciplina_nome}-${item.turno || item.disciplina_turno}-${item.ano || item.semestre_alocacao}`}>
-              <td>{'ADS'}</td> {/* Hardcoded 'ADS' na coluna da tabela */}
-              <td>{item.disciplina_turno}</td>
-              <td>{item.semestre_alocacao}</td>
-              <td>{item.disciplina_nome}</td>
-              <td>{item.professor_nome}</td>
-              <td>{item.numero_sala} ({item.tipo_sala})</td>
+              <td data-label="Curso">{'ADS'}</td> {/* Hardcoded 'ADS' na coluna da tabela */}
+              <td data-label="Turno">{item.disciplina_turno}</td>
+              <td data-label="Semestre">{item.semestre_alocacao}</td>
+              <td data-label="Disciplina">{item.disciplina_nome}</td>
+              <td data-label="Professor">{item.professor_nome}</td>
+              <td data-label="Sala">{item.numero_sala} ({item.tipo_sala})</td>
             </tr>
           ))}
         </tbody>
