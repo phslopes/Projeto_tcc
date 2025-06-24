@@ -77,8 +77,7 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
               value={turno}
               onChange={(e) => setTurno(e.target.value)}
               className="mt-1 p-2 border border-gray-300 rounded"
-              // ReadOnly se estiver editando
-              readOnly={!!initialData}
+              disabled={!!initialData} // Desabilita se estiver editando
             >
               <option value="">Selecione</option>
               <option value="Manhã">Manhã</option>
@@ -87,13 +86,22 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
             </select>
           </label>
 
+
           <label className="flex flex-col text-sm font-medium text-gray-700">
             Carga Horária:
             <input
               type="number"
+              min={1}
+              max={4}
+              step={1}
               value={carga}
-              onChange={(e) => setCarga(e.target.value)}
-              placeholder="Carga horária"
+              onChange={(e) => {
+                const value = parseInt(e.target.value, 10);
+                if (value >= 1 && value <= 4 || e.target.value === "") {
+                  setCarga(e.target.value);
+                }
+              }}
+              placeholder="Carga horária (1 a 4)"
               className="mt-1 p-2 border border-gray-300 rounded"
             />
           </label>
@@ -102,10 +110,17 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
             Semestre:
             <input
               type="number"
+              min={1}
+              max={6}
+              step={1}
               value={semestre_curso}
-              onChange={(e) => setSemestreCurso(e.target.value)}
+              onChange={(e) => {
+                const value = setSemestreCurso(e.target.value, 10);
+                if (value >= 1 && value <= 6 || e.target.value === "") {
+                  setSemestreCurso(value);
+                }
+              }}
               placeholder="Semestre"
-              min="1"
               className="mt-1 p-2 border border-gray-300 rounded"
             />
           </label>

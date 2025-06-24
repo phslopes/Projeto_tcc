@@ -1,32 +1,30 @@
 import React, { useState, useEffect } from "react";
 import CadastroDisciplinas from "./CadastroDisciplinas";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import "./DisciplinaPage.css";
-import { api } from "../../utils/api"; // Importa o utilitário de API
+import "./DisciplinaPage.css"; // Certifique-se que o caminho está correto
+import { api } from "../../utils/api";
 
 function DisciplinasPage() {
   const [disciplinas, setDisciplinas] = useState([]);
   const [mostrarForm, setMostrarForm] = useState(false);
   const [disciplinaEditando, setDisciplinaEditando] = useState(null);
-  const [loading, setLoading] = useState(false); // Estado de loading
-  const [error, setError] = useState(null); // Estado de erro
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Função para buscar disciplinas do backend
   const fetchDisciplinas = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await api.get('/disciplines'); // Chama a API para obter disciplinas
+      const data = await api.get("/disciplines");
       setDisciplinas(data);
     } catch (err) {
-      setError(err.message || 'Erro ao carregar disciplinas.');
+      setError(err.message || "Erro ao carregar disciplinas.");
       console.error("Erro ao carregar disciplinas:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Chama fetchDisciplinas ao montar o componente
   useEffect(() => {
     fetchDisciplinas();
   }, []);
@@ -35,14 +33,14 @@ function DisciplinasPage() {
     setLoading(true);
     setError(null);
     try {
-      await api.post('/disciplines', disciplina); // Chama a API para adicionar
+      await api.post("/disciplines", disciplina);
       setMostrarForm(false);
-      setDisciplinaEditando(null); // Limpa o estado de edição
-      fetchDisciplinas(); // Recarrega a lista
+      setDisciplinaEditando(null);
+      fetchDisciplinas();
     } catch (err) {
-      setError(err.message || 'Erro ao adicionar disciplina.');
+      setError(err.message || "Erro ao adicionar disciplina.");
       console.error("Erro ao adicionar disciplina:", err);
-      alert(err.message || 'Erro ao adicionar disciplina.'); // Alerta o usuário
+      alert(err.message || "Erro ao adicionar disciplina.");
     } finally {
       setLoading(false);
     }
@@ -52,16 +50,15 @@ function DisciplinasPage() {
     setLoading(true);
     setError(null);
     try {
-      // O backend precisa do nome e turno antigos para identificar a disciplina
       const { oldNome, oldTurno } = disciplinaEditando;
       await api.put(`/disciplines/${oldNome}/${oldTurno}`, disciplinaAtualizada);
       setMostrarForm(false);
-      setDisciplinaEditando(null); // Limpa o estado de edição
-      fetchDisciplinas(); // Recarrega a lista
+      setDisciplinaEditando(null);
+      fetchDisciplinas();
     } catch (err) {
-      setError(err.message || 'Erro ao atualizar disciplina.');
+      setError(err.message || "Erro ao atualizar disciplina.");
       console.error("Erro ao atualizar disciplina:", err);
-      alert(err.message || 'Erro ao atualizar disciplina.'); // Alerta o usuário
+      alert(err.message || "Erro ao atualizar disciplina.");
     } finally {
       setLoading(false);
     }
@@ -72,13 +69,14 @@ function DisciplinasPage() {
       setLoading(true);
       setError(null);
       try {
-        // O backend precisa do nome e turno para excluir a disciplina
-        await api.delete(`/disciplines/${disciplinaParaExcluir.nome}/${disciplinaParaExcluir.turno}`);
-        fetchDisciplinas(); // Recarrega a lista
+        await api.delete(
+          `/disciplines/${disciplinaParaExcluir.nome}/${disciplinaParaExcluir.turno}`
+        );
+        fetchDisciplinas();
       } catch (err) {
-        setError(err.message || 'Erro ao excluir disciplina.');
+        setError(err.message || "Erro ao excluir disciplina.");
         console.error("Erro ao excluir disciplina:", err);
-        alert(err.message || 'Erro ao excluir disciplina.'); // Alerta o usuário
+        alert(err.message || "Erro ao excluir disciplina.");
       } finally {
         setLoading(false);
       }
@@ -86,39 +84,50 @@ function DisciplinasPage() {
   };
 
   const iniciarEdicao = (disciplina) => {
-    // Ao iniciar a edição, guarda os dados originais da disciplina para identificar no update
     setDisciplinaEditando({
       ...disciplina,
-      oldNome: disciplina.nome, // Guarda o nome original para a chamada PUT
-      oldTurno: disciplina.turno, // Guarda o turno original para a chamada PUT
+      oldNome: disciplina.nome,
+      oldTurno: disciplina.turno,
     });
     setMostrarForm(true);
   };
 
-  // Mensagens de Loading e Erro
   if (loading) {
-    return <div className="container-disciplinas"><p>Carregando disciplinas...</p></div>;
+    return (
+      <div className="container-disciplinas">
+        <p>Carregando disciplinas...</p>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="container-disciplinas"><p className="text-red-500">Erro: {error}</p></div>;
+    return (
+      <div className="container-disciplinas">
+        <p className="text-red-500">Erro: {error}</p>
+      </div>
+    );
   }
 
   return (
     <div className="container-disciplinas">
       <div className="header-disciplinas">
         <h2>Lista de Disciplinas</h2>
-        <button className="btn-add" onClick={() => {
-          setDisciplinaEditando(null);
-          setMostrarForm(true);
-        }}>
+        <button
+          className="btn-add"
+          onClick={() => {
+            setDisciplinaEditando(null);
+            setMostrarForm(true);
+          }}
+        >
           NOVA DISCIPLINA
         </button>
       </div>
 
       <table className="table-disciplinas">
         <thead>
-          <tr className="header-linha">
+          <tr>
+            {" "}
+            {/* Removida a classe 'header-linha' */}
             <th>Nome</th>
             <th>Turno</th>
             <th>Carga</th>
@@ -129,18 +138,23 @@ function DisciplinasPage() {
         </thead>
         <tbody>
           {disciplinas.map((d, index) => (
-            // A key deve ser única, como nome+turno. O index é um fallback seguro para local.
             <tr key={`${d.nome}-${d.turno}-${index}`}>
               <td>{d.nome}</td>
               <td>{d.turno}</td>
               <td>{d.carga}</td>
               <td>{d.semestre_curso}</td>
               <td>{d.curso}</td>
-              <td>
-                <button className="btn-acao" onClick={() => iniciarEdicao(d)}>
+              <td className="coluna-acoes">
+                {" "}
+                {/* Aplicada a nova classe 'coluna-acoes' */}
+                <button className="btn-acao-edit" onClick={() => iniciarEdicao(d)}>
+                  {" "}
+                  {/* Nova classe 'btn-acao-edit' */}
                   <FaEdit />
                 </button>
-                <button className="btn-acao" onClick={() => excluirDisciplina(d)}>
+                <button className="btn-acao-delete" onClick={() => excluirDisciplina(d)}>
+                  {" "}
+                  {/* Nova classe 'btn-acao-delete' */}
                   <FaTrash />
                 </button>
               </td>
