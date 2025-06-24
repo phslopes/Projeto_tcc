@@ -1,45 +1,85 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './ThDashboard.css';
+import { api } from '../../../utils/api'; // Importa o utilitário de API
 
-const dados = [
-  { curso: 'ADS', turno: 'Tarde', semestre: '1º', disciplina: 'Cálculo', professor: 'Prof. Cachucho', sala: '8' },
-  { curso: 'ADS', turno: 'Noite', semestre: '2º', disciplina: 'Algoritimos', professor: 'Prof. Ulisses', sala: '5' },
-  { curso: 'GCOM', turno: 'Manhã', semestre: '1º', disciplina: 'Administração', professor: 'Prof. Lima', sala: '201' },
-  { curso: 'GCOM', turno: 'Noite', semestre: '2º', disciplina: 'Marketing', professor: 'Prof. Mendes', sala: '202' },
-  // Adicione mais dados conforme necessário
-];
-
-export default function StudentDashboard() {
+export default function AlocacaoFIltro() {
+  const [alocacoesCompletas, setAlocacoesCompletas] = useState([]);
   const [filtros, setFiltros] = useState({ curso: '', turno: '', semestre: '' });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const cursos = [...new Set(dados.map(item => item.curso))];
-  const turnos = [...new Set(dados.map(item => item.turno))];
-  const semestres = [...new Set(dados.map(item => item.semestre))];
+  const fetchAlocacoes = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      let data = await api.get('/allocations'); 
+      setAlocacoesCompletas(data);
+    } catch (err) {
+      setError(err.message || 'Erro ao carregar dados do dashboard.');
+      console.error("Erro ao carregar dados do dashboard:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAlocacoes();
+  }, []);
+
+  // Deriva as opções de filtro dos dados carregados
+  // Adiciona a opção fixa 'ADS' no início das opções de curso
+  const cursosUnicos = [...new Set(alocacoesCompletas.map(item => item.curso).filter(Boolean))];
+  // *** MODIFICAÇÃO AQUI: Adicionar o item 'ADS' fixo ***
+  const cursos = ['ADS_FIXED_NO_FILTER', ...cursosUnicos]; // Usamos um valor único para o item fixo que não vai filtrar
+
+  const turnos = [...new Set(alocacoesCompletas.map(item => item.disciplina_turno).filter(Boolean))];
+  const semestres = [...new Set(alocacoesCompletas.map(item => item.semestre_alocacao).filter(Boolean))];
 
   const handleFiltroChange = (e) => {
     const { name, value } = e.target;
     setFiltros(prev => ({ ...prev, [name]: value }));
   };
 
-  const dadosFiltrados = dados.filter(item =>
-    (!filtros.curso || item.curso === filtros.curso) &&
-    (!filtros.turno || item.turno === filtros.turno) &&
-    (!filtros.semestre || item.semestre === filtros.semestre)
+  const dadosFiltrados = alocacoesCompletas.filter(item =>
+    // *** MODIFICAÇÃO AQUI: Lógica para o filtro de curso não fazer nada se 'ADS_FIXED_NO_FILTER' for selecionado ***
+    (filtros.curso === 'ADS_FIXED_NO_FILTER' || !filtros.curso || item.curso === filtros.curso) && 
+    (!filtros.turno || item.disciplina_turno === filtros.turno) &&
+    (!filtros.semestre || item.semestre_alocacao === parseInt(filtros.semestre))
   );
+
+  if (loading) {
+    return (
+      <div className="container-dashboard">
+        <p>Carregando dados do dashboard...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container-dashboard">
+        <p className="text-red-500">Erro: {error}</p>
+        <p>Verifique se o backend está rodando e se você está logado com permissão de administrador.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container-dashboard">
       <div className="header-dashboard">
-        <h2>Filtros de alocação</h2>
-        </div>
-        <hr className="linha-separadora" />
+        <h2>Filtros de Alocação</h2>
+      </div>
+      <hr className="linha-separadora" />
       <div className="filtros">
         <div className="filtro">
           <label>Curso</label>
           <select name="curso" value={filtros.curso} onChange={handleFiltroChange}>
             <option value="">Todos</option>
             {cursos.map(curso => (
-              <option key={curso} value={curso}>{curso}</option>
+              // *** MODIFICAÇÃO AQUI: Exibir 'ADS' para o valor fixo ***
+              <option key={curso} value={curso}>
+                {curso === 'ADS_FIXED_NO_FILTER' ? 'ADS' : curso}
+              </option>
             ))}
           </select>
         </div>
@@ -77,13 +117,13 @@ export default function StudentDashboard() {
         </thead>
         <tbody>
           {dadosFiltrados.map((item, index) => (
-            <tr key={index}>
-              <td>{item.curso}</td>
-              <td>{item.turno}</td>
-              <td>{item.semestre}</td>
-              <td>{item.disciplina}</td>
-              <td>{item.professor}</td>
-              <td>{item.sala}</td>
+            <tr key={`mock-${item.numero_sala}-${item.tipo_sala}-${item.id_professor}-${item.nome || item.disciplina_nome}-${item.turno || item.disciplina_turno}-${item.ano || item.semestre_alocacao}`}>
+              <td>{'ADS'}</td> {/* Hardcoded 'ADS' na coluna da tabela */}
+              <td>{item.disciplina_turno}</td>
+              <td>{item.semestre_alocacao}</td>
+              <td>{item.disciplina_nome}</td>
+              <td>{item.professor_nome}</td>
+              <td>{item.numero_sala} ({item.tipo_sala})</td>
             </tr>
           ))}
         </tbody>
@@ -91,5 +131,3 @@ export default function StudentDashboard() {
     </div>
   );
 }
-
-
