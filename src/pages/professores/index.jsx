@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import CadastroProfessores from "./CadastroProfessores";
-import "./ProfessoresPage.css"; // Certifique-se que o caminho está correto
+import "./ProfessoresPage.css";
 import { api } from "../../utils/api";
 
 function ProfessoresPage() {
@@ -123,7 +123,6 @@ function ProfessoresPage() {
         <thead>
           <tr>
             {" "}
-            {/* Removida a classe 'header-linha' */}
             <th>Nome</th>
             <th>Telefone</th>
             <th>Email</th>
@@ -138,13 +137,11 @@ function ProfessoresPage() {
               <td>{d.email}</td>
               <td className="coluna-acoes">
                 {" "}
-                {/* Aplicada a nova classe 'coluna-acoes' */}
                 <button
                   className="btn-acao-edit"
                   onClick={() => iniciarEdicao(d)}
                 >
                   {" "}
-                  {/* Nova classe 'btn-acao-edit' */}
                   <FaEdit />
                 </button>
                 <button
@@ -152,7 +149,6 @@ function ProfessoresPage() {
                   onClick={() => excluirProfessor(d.id_professor)}
                 >
                   {" "}
-                  {/* Nova classe 'btn-acao-delete' */}
                   <FaTrash />
                 </button>
               </td>

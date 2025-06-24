@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Estilos responsivos para modais */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -107,26 +106,25 @@
   background-color: #8c0000;
 }
 
-/* Responsividade para telas menores */
 @media (max-width: 640px) {
   .modal-overlay {
     padding: 0.5rem;
   }
-  
+
   .modal-content {
     padding: 1rem;
     max-height: 95vh;
   }
-  
+
   .modal-title {
     font-size: 1.125rem;
   }
-  
+
   .modal-form input,
   .modal-form select {
     padding: 0.625rem;
   }
-  
+
   .modal-submit-btn {
     padding: 0.625rem;
   }
@@ -136,12 +134,12 @@
   .modal-content {
     padding: 0.75rem;
   }
-  
+
   .modal-title {
     font-size: 1rem;
     margin-bottom: 0.75rem;
   }
-  
+
   .modal-form {
     gap: 0.75rem;
   }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './ThDashboard.css';
-import { api } from '../../../utils/api'; // Importa o utilitário de API
+import { api } from '../../../utils/api';
 
 export default function AlocacaoFIltro() {
   const [alocacoesCompletas, setAlocacoesCompletas] = useState([]);
@@ -12,7 +12,7 @@ export default function AlocacaoFIltro() {
     setLoading(true);
     setError(null);
     try {
-      let data = await api.get('/allocations'); 
+      let data = await api.get('/allocations', { params: { tipoAlocacao: 'fixo' } });
       setAlocacoesCompletas(data);
     } catch (err) {
       setError(err.message || 'Erro ao carregar dados do dashboard.');
@@ -26,11 +26,8 @@ export default function AlocacaoFIltro() {
     fetchAlocacoes();
   }, []);
 
-  // Deriva as opções de filtro dos dados carregados
-  // Adiciona a opção fixa 'ADS' no início das opções de curso
   const cursosUnicos = [...new Set(alocacoesCompletas.map(item => item.curso).filter(Boolean))];
-  // *** MODIFICAÇÃO AQUI: Adicionar o item 'ADS' fixo ***
-  const cursos = ['ADS_FIXED_NO_FILTER', ...cursosUnicos]; // Usamos um valor único para o item fixo que não vai filtrar
+  const cursos = ['ADS_FIXED_NO_FILTER', ...cursosUnicos];
 
   const turnos = [...new Set(alocacoesCompletas.map(item => item.disciplina_turno).filter(Boolean))];
   const semestres = [...new Set(alocacoesCompletas.map(item => item.semestre_alocacao).filter(Boolean))];
@@ -41,11 +38,12 @@ export default function AlocacaoFIltro() {
   };
 
   const dadosFiltrados = alocacoesCompletas.filter(item =>
-    // *** MODIFICAÇÃO AQUI: Lógica para o filtro de curso não fazer nada se 'ADS_FIXED_NO_FILTER' for selecionado ***
-    (filtros.curso === 'ADS_FIXED_NO_FILTER' || !filtros.curso || item.curso === filtros.curso) && 
+    (filtros.curso === 'ADS_FIXED_NO_FILTER' || !filtros.curso || item.curso === filtros.curso) &&
     (!filtros.turno || item.disciplina_turno === filtros.turno) &&
     (!filtros.semestre || item.semestre_alocacao === parseInt(filtros.semestre))
   );
+
+  const podeExibirTabela = filtros.curso && filtros.turno;
 
   if (loading) {
     return (
@@ -67,7 +65,7 @@ export default function AlocacaoFIltro() {
   return (
     <div className="container-dashboard">
       <div className="header-dashboard">
-        <h2>Filtros de Alocação</h2>
+        <h2>Grade de Aulas</h2>
       </div>
       <hr className="linha-separadora" />
       <div className="filtros">
@@ -76,7 +74,6 @@ export default function AlocacaoFIltro() {
           <select name="curso" value={filtros.curso} onChange={handleFiltroChange}>
             <option value="">Todos</option>
             {cursos.map(curso => (
-              // *** MODIFICAÇÃO AQUI: Exibir 'ADS' para o valor fixo ***
               <option key={curso} value={curso}>
                 {curso === 'ADS_FIXED_NO_FILTER' ? 'ADS' : curso}
               </option>
@@ -104,30 +101,46 @@ export default function AlocacaoFIltro() {
         </div>
       </div>
 
-      <table className="tabela">
-        <thead>
-          <tr>
-            <th>Curso</th>
-            <th>Turno</th>
-            <th>Semestre</th>
-            <th>Disciplina</th>
-            <th>Professor</th>
-            <th>Sala</th>
-          </tr>
-        </thead>
-        <tbody>
-          {dadosFiltrados.map((item, index) => (
-            <tr key={`mock-${item.numero_sala}-${item.tipo_sala}-${item.id_professor}-${item.nome || item.disciplina_nome}-${item.turno || item.disciplina_turno}-${item.ano || item.semestre_alocacao}`}>
-              <td data-label="Curso">{'ADS'}</td> {/* Hardcoded 'ADS' na coluna da tabela */}
-              <td data-label="Turno">{item.disciplina_turno}</td>
-              <td data-label="Semestre">{item.semestre_alocacao}</td>
-              <td data-label="Disciplina">{item.disciplina_nome}</td>
-              <td data-label="Professor">{item.professor_nome}</td>
-              <td data-label="Sala">{item.numero_sala} ({item.tipo_sala})</td>
+      {podeExibirTabela ? (
+        <table className="tabela">
+          <thead>
+            <tr>
+              <th>Semestre</th>
+              <th>Horário Início</th>
+              <th>Dia da Semana</th>
+              <th>Disciplina</th>
+              <th>Professor</th>
+              <th>Sala</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {dadosFiltrados.map((item, index) => (
+              <tr key={`mock-${item.numero_sala}-${item.tipo_sala}-${item.id_professor}-${item.nome || item.disciplina_nome}-${item.turno || item.disciplina_turno}-${item.ano || item.semestre_alocacao}`}>
+                <td>{item.semestre_alocacao}</td>
+                <td>{item.hora_inicio ? item.hora_inicio.substring(0, 5) : ''}</td>
+                <td>{(() => {
+                  const dias = {
+                    2: 'Segunda-feira',
+                    3: 'Terça-feira',
+                    4: 'Quarta-feira',
+                    5: 'Quinta-feira',
+                    6: 'Sexta-feira',
+                    7: 'Sábado'
+                  };
+                  return dias[item.dia_semana] || '';
+                })()}</td>
+                <td>{item.disciplina_nome}</td>
+                <td>{item.professor_nome}</td>
+                <td>{item.numero_sala} ({item.tipo_sala})</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <div style={{ marginTop: 32, color: '#b20000', fontWeight: 'bold', textAlign: 'center' }}>
+          Selecione <u>Curso</u> e <u>Turno</u> para visualizar a tabela de alocações.
+        </div>
+      )}
     </div>
   );
 }

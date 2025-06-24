@@ -2,15 +2,17 @@
   padding: 2rem;
   font-family: 'Arial', sans-serif;
 }
+
 .header-dashboard {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
 }
+
 .header-dashboard h2 {
- font-size: 1.5rem;
-    font-weight: bold;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
 
@@ -44,10 +46,11 @@
   width: 100%;
   border-collapse: collapse;
   background-color: #fff;
-  
+
 }
 
-.tabela th, .tabela td {
+.tabela th,
+.tabela td {
   padding: 0.75rem;
   border: 1px solid #ddd;
   text-align: left;
@@ -110,6 +113,6 @@ input[type="checkbox"]:checked::after {
   background: white;
   padding: 20px 30px;
   border-radius: 8px;
-  box-shadow: 0 0 12px rgba(0,0,0,0.25);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
   text-align: center;
 }

@@ -1,153 +1,166 @@
 .container-dashboard {
-  padding: 1rem; /* Reduz o padding em telas menores */
-  font-family: 'Arial', sans-serif;
+  padding: 2.5rem 2rem;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #fafbfc;
+  min-height: 100vh;
 }
 
 .header-dashboard {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem; /* Reduz a margem em telas menores */
-  flex-direction: column; /* Empilha em telas pequenas */
-  text-align: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
 }
 
 .header-dashboard h2 {
-  font-size: 1.2rem; /* Reduz o tamanho da fonte para títulos */
-  font-weight: bold;
-  margin-bottom: 0.5rem; /* Adiciona margem abaixo do título */
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+
+.linha-separadora {
+  border: none;
+  height: 2px;
+  background-color: #e0e0e0;
+  width: 100%;
+  margin: 1.5rem 0;
 }
 
 .filtros {
   display: flex;
-  flex-direction: column; /* Empilha os filtros em telas pequenas */
-  gap: 1rem;
-  margin-bottom: 1.5rem; /* Reduz a margem */
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .filtro {
   display: flex;
   flex-direction: column;
-  min-width: unset; /* Remove largura mínima em telas pequenas */
-  width: 100%; /* Ocupa toda a largura disponível */
+  min-width: 180px;
 }
 
 .filtro label {
   margin-bottom: 0.5rem;
-  font-weight: bold;
-  color: #555;
+  font-weight: 600;
+  color: #333;
+  letter-spacing: 0.5px;
 }
 
 .filtro select {
-  padding: 0.6rem; /* Ajusta o padding do select */
-  border-radius: 4px;
-  border: 1px solid #ccc;
-  width: 100%; /* Garante que o select ocupe 100% da largura */
-  box-sizing: border-box; /* Inclui padding e borda na largura total */
+  padding: 0.7rem;
+  border-radius: 6px;
+  border: 1.5px solid #ccc;
+  background: #fff;
+  font-size: 1rem;
+  transition: border 0.2s;
+}
+
+.filtro select:focus {
+  border: 1.5px solid #b20000;
+  outline: none;
 }
 
 .tabela {
   width: 100%;
-  border-collapse: collapse;
-  background-color: #fff;
-  display: block; /* Permite o scroll horizontal na tabela */
-  overflow-x: auto; /* Adiciona scroll horizontal se o conteúdo for muito largo */
-  white-space: nowrap; /* Evita que o texto quebre dentro das células */
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 1rem;
 }
 
 .tabela thead {
-  display: none; /* Oculta o cabeçalho da tabela em telas pequenas */
-}
-
-.tabela tr {
-  display: block; /* Faz cada linha da tabela se comportar como um bloco */
-  margin-bottom: 1rem;
-  border: 1px solid #ddd; /* Adiciona uma borda a cada "card" da linha */
-  border-radius: 8px;
-  padding: 0.5rem;
-}
-
-.tabela td {
-  display: flex; /* Exibe os dados de cada célula em linha */
-  justify-content: space-between; /* Alinha o conteúdo à esquerda e direita */
-  padding: 0.5rem 0; /* Ajusta o padding vertical */
-  border: none; /* Remove bordas internas das células */
-}
-
-.tabela td:before {
-  content: attr(data-label); /* Usa o atributo data-label para exibir o cabeçalho */
-  font-weight: bold;
-  margin-right: 0.5rem;
+  background: #f5f5f5;
   color: #333;
 }
 
-.linha-separadora {
-  border: none;
-  height: 1px; /* Linha mais fina */
-  background-color: #ddd;
-  width: 100%;
-  margin: 1rem 0;
+.tabela th,
+.tabela td {
+  padding: 1rem 1.2rem;
+  text-align: left;
+  font-size: 1rem;
 }
 
-/* Media Queries para telas maiores (tablets e desktops) */
-@media (min-width: 768px) {
-  .container-dashboard {
-    padding: 2rem;
+.tabela th {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #333;
+  border-bottom: 2px solid #e0e0e0;
+  background: #f5f5f5;
+}
+
+.tabela tr {
+  transition: background 0.18s;
+}
+
+.tabela tbody tr:hover {
+  background: #f7eaea;
+}
+
+.tabela td {
+  border-bottom: 1px solid #f0f0f0;
+  color: #333;
+}
+
+.tabela tr:last-child td {
+  border-bottom: none;
+}
+
+@media (max-width: 900px) {
+  .filtros {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
   }
 
   .header-dashboard {
-    flex-direction: row; /* Volta para linha em telas maiores */
-    text-align: left;
-    margin-bottom: 1.5rem;
-  }
-
-  .header-dashboard h2 {
-    font-size: 1.5rem;
-    margin-bottom: 0;
-  }
-
-  .filtros {
-    flex-direction: row; /* Volta para linha em telas maiores */
-    justify-content: center;
-    flex-wrap: wrap; /* Permite quebrar linha se não houver espaço */
-    gap: 1rem;
-    margin-bottom: 2rem;
-  }
-
-  .filtro {
-    min-width: 150px; /* Restaura a largura mínima */
-    width: auto; /* Largura automática */
-  }
-
-  .filtro select {
-    padding: 0.5rem;
-  }
-
-  .tabela {
-    display: table; /* Volta a ser uma tabela normal */
-    overflow-x: unset; /* Remove o scroll horizontal */
-    white-space: normal; /* Permite que o texto quebre */
-  }
-
-  .tabela thead {
-    display: table-header-group; /* Exibe o cabeçalho da tabela */
-  }
-
-  .tabela tr {
-    display: table-row; /* Volta a ser uma linha de tabela normal */
-    border: none; /* Remove a borda dos "cards" */
-    margin-bottom: 0;
-    padding: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 
   .tabela th,
   .tabela td {
-    border: 1px solid #ddd; /* Restaura as bordas das células */
-    padding: 0.75rem;
-    display: table-cell; /* Volta a ser uma célula de tabela */
+    padding: 0.7rem 0.5rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .container-dashboard {
+    padding: 1rem 0.2rem;
   }
 
-  .tabela td:before {
-    content: none; /* Remove o "cabeçalho" embutido */
+  .tabela th,
+  .tabela td {
+    padding: 0.5rem 0.2rem;
+    font-size: 0.92rem;
   }
+
+  .header-dashboard h2 {
+    font-size: 1.2rem;
+  }
+}
+
+/* Botão de ação (se houver) */
+.btn-dashboard {
+  background: #333;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.btn-dashboard:hover {
+  background: #b20000;
 }

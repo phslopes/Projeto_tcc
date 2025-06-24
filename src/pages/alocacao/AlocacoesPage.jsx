@@ -4,12 +4,12 @@ import "./AlocacoesPage.css";
 import { api } from "../../utils/api";
 
 const diasSemanaConst = [
-    { value: 2, label: 'Segunda-feira' },
-    { value: 3, label: 'Terça-feira' },
-    { value: 4, label: 'Quarta-feira' },
-    { value: 5, label: 'Quinta-feira' },
-    { value: 6, label: 'Sexta-feira' },
-    { value: 7, label: 'Sábado' },
+  { value: 2, label: 'Segunda-feira' },
+  { value: 3, label: 'Terça-feira' },
+  { value: 4, label: 'Quarta-feira' },
+  { value: 5, label: 'Quinta-feira' },
+  { value: 6, label: 'Sexta-feira' },
+  { value: 7, label: 'Sábado' },
 ];
 
 function AlocacoesPage() {
@@ -69,7 +69,7 @@ function AlocacoesPage() {
     fetchAlocacoes();
     fetchDropdownData();
   }, [fetchAlocacoes, fetchDropdownData]);
-  
+
   useEffect(() => {
     if (disciplinaSelecionadaForm) {
       const [discNome, discTurno] = disciplinaSelecionadaForm.split('|');
@@ -104,37 +104,37 @@ function AlocacoesPage() {
       alert("Vínculo Professor-Disciplina não encontrado. Verifique a associação.");
       return;
     }
-    
+
     if (!vinculoExistente.dia_semana || !vinculoExistente.hora_inicio) {
       alert("Vínculo Professor-Disciplina não possui dia da semana ou horário definido. Verifique a associação.");
       return;
     }
-    
+
     const [numero_sala_str, tipo_sala] = salaSelecionadaForm.split('|');
     const payload = {
-        numero_sala: parseInt(numero_sala_str),
-        tipo_sala: tipo_sala,
-        id_professor: professorAutoPreenchidoId,
-        nome: nomeDisc,
-        turno: turnoDisc,
-        ano: vinculoExistente.ano,
-        semestre_alocacao: vinculoExistente.semestre_alocacao,
-        tipo_alocacao: 'fixo',
-        dia_semana: vinculoExistente.dia_semana,
-        hora_inicio: vinculoExistente.hora_inicio
+      numero_sala: parseInt(numero_sala_str),
+      tipo_sala: tipo_sala,
+      id_professor: professorAutoPreenchidoId,
+      nome: nomeDisc,
+      turno: turnoDisc,
+      ano: vinculoExistente.ano,
+      semestre_alocacao: vinculoExistente.semestre_alocacao,
+      tipo_alocacao: 'fixo',
+      dia_semana: vinculoExistente.dia_semana,
+      hora_inicio: vinculoExistente.hora_inicio
     };
     try {
       await api.post('/allocations', payload);
       alert('Alocação criada com sucesso!');
       setDisciplinaSelecionadaForm("");
       setSalaSelecionadaForm("");
-      fetchAlocacoes(); 
+      fetchAlocacoes();
     } catch (err) {
       console.error("Erro ao associar/alocar:", err);
       alert(err.message || "Ocorreu um erro ao criar alocação.");
     }
   };
-  
+
   const handleEditarAlocacao = (alocacao) => {
     setEditingAlocacao(alocacao);
     setNewlySelectedRoom("");
@@ -192,7 +192,7 @@ function AlocacoesPage() {
 
   const cursosUnicos = [...new Set(disciplinas.map(d => d.curso))];
   const turnosDisciplinasUnicos = [...new Set(disciplinas.map(d => d.turno))];
-  const semestresCursoUnicos = [...new Set(disciplinas.map(d => d.semestre_curso))].sort((a,b) => a-b);
+  const semestresCursoUnicos = [...new Set(disciplinas.map(d => d.semestre_curso))].sort((a, b) => a - b);
   const disciplinasFiltradasParaForm = disciplinas.filter(
     (d) =>
       (!filtroCurso || d.curso === filtroCurso) &&
@@ -201,39 +201,15 @@ function AlocacoesPage() {
   );
 
   return (
-    <div className="container-alocacoes">
-      <div className="header-alocacoes">
-        <h2>Lista de Alocações</h2>
+    <div className="container-alocacoes" style={{ background: '#fafbfc', minHeight: '100vh', fontFamily: 'Segoe UI, Arial, sans-serif', padding: '2rem 1.5rem' }}>
+      <div className="header-alocacoes" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+        <h2 style={{ fontSize: '1.7rem', fontWeight: 600, color: '#333', letterSpacing: '0.5px', marginBottom: '0.3rem' }}>Lista de Alocações</h2>
       </div>
 
-      <div className="filtros-alocacoes">
-        <label>
-          Curso:
-          <select value={filtroCurso} onChange={(e) => setFiltroCurso(e.target.value)}>
-            <option value="">Todos</option>
-            {cursosUnicos.map((c) => (<option key={c} value={c}>{c}</option>))}
-          </select>
-        </label>
-        <label>
-          Turno:
-          <select value={filtroTurno} onChange={(e) => setFiltroTurno(e.target.value)}>
-            <option value="">Todos</option>
-            {turnosDisciplinasUnicos.map((t) => (<option key={t} value={t}>{t}</option>))}
-          </select>
-        </label>
-        <label>
-          Semestre:
-          <select value={filtroSemestreCurso} onChange={(e) => setFiltroSemestreCurso(e.target.value)}>
-            <option value="">Todos</option>
-            {semestresCursoUnicos.map((s) => (<option key={s} value={s}>{s}º</option>))}
-          </select>
-        </label>
-      </div>
-
-      <div className="form-associacao-alocacao">
-        <label>
+      <div className="form-associacao-alocacao" style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap', marginBottom: '2rem' }}>
+        <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.97rem', fontWeight: 500, color: '#333', flexGrow: 1, minWidth: '150px' }}>
           Disciplina:
-          <select value={disciplinaSelecionadaForm} onChange={(e) => setDisciplinaSelecionadaForm(e.target.value)}>
+          <select value={disciplinaSelecionadaForm} onChange={(e) => setDisciplinaSelecionadaForm(e.target.value)} style={{ marginTop: '0.25rem', padding: '0.6rem', borderRadius: '5px', border: '1.2px solid #ccc', width: '100%', fontSize: '1rem' }}>
             <option value="">Selecione</option>
             {disciplinasFiltradasParaForm.map((d) => (
               <option key={`${d.nome}|${d.turno}`} value={`${d.nome}|${d.turno}`}>
@@ -242,21 +218,21 @@ function AlocacoesPage() {
             ))}
           </select>
         </label>
-        <label>
+        <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.97rem', fontWeight: 500, color: '#333', flexGrow: 1, minWidth: '150px' }}>
           Professor:
-          <input type="text" value={professorAutoPreenchidoNome} readOnly className="readonly-input-alocacao" />
+          <input type="text" value={professorAutoPreenchidoNome} readOnly style={{ marginTop: '0.25rem', padding: '0.6rem', borderRadius: '5px', border: '1.2px solid #ccc', width: '100%', background: '#f5f5f5', color: '#888' }} />
         </label>
-        <label>
+        <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.97rem', fontWeight: 500, color: '#333', flexGrow: 1, minWidth: '150px' }}>
           Dia da Semana:
-          <input type="text" value={diaSemanaForm ? diasSemanaConst.find(d => d.value === parseInt(diaSemanaForm))?.label : ''} readOnly className="readonly-input-alocacao" />
+          <input type="text" value={diaSemanaForm ? diasSemanaConst.find(d => d.value === parseInt(diaSemanaForm))?.label : ''} readOnly style={{ marginTop: '0.25rem', padding: '0.6rem', borderRadius: '5px', border: '1.2px solid #ccc', width: '100%', background: '#f5f5f5', color: '#888' }} />
         </label>
-        <label>
+        <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.97rem', fontWeight: 500, color: '#333', flexGrow: 1, minWidth: '150px', maxWidth: '120px' }}>
           Horário:
-          <input type="text" value={horaInicioForm} readOnly className="readonly-input-alocacao" />
+          <input type="text" value={horaInicioForm} readOnly style={{ marginTop: '0.25rem', padding: '0.6rem', borderRadius: '5px', border: '1.2px solid #ccc', width: '120px', background: '#f5f5f5', color: '#888' }} />
         </label>
-        <label>
+        <label style={{ display: 'flex', flexDirection: 'column', fontSize: '0.97rem', fontWeight: 500, color: '#333', flexGrow: 1, minWidth: '150px' }}>
           Sala:
-          <select value={salaSelecionadaForm} onChange={(e) => setSalaSelecionadaForm(e.target.value)}>
+          <select value={salaSelecionadaForm} onChange={(e) => setSalaSelecionadaForm(e.target.value)} style={{ marginTop: '0.25rem', padding: '0.6rem', borderRadius: '5px', border: '1.2px solid #ccc', width: '100%', fontSize: '1rem' }}>
             <option value="">Selecione</option>
             {salas.map((s) => (
               <option key={`${s.numero_sala}-${s.tipo_sala}`} value={`${s.numero_sala}|${s.tipo_sala}`}>
@@ -265,41 +241,56 @@ function AlocacoesPage() {
             ))}
           </select>
         </label>
-        <button className="btn-associar-alocacao" onClick={handleAssociarAlocacao}>ALOCAR</button>
+        <div style={{ display: 'flex', alignItems: 'flex-end', marginLeft: '1rem' }}>
+          <button className="btn-associar-alocacao" style={{ height: 'auto', padding: '0.65rem 1.2rem', backgroundColor: '#b20000', color: 'white', fontWeight: 600, fontSize: '1rem', border: 'none', borderRadius: '5px', cursor: 'pointer', whiteSpace: 'nowrap', transition: 'background 0.18s' }} onClick={handleAssociarAlocacao}>
+            ALOCAR
+          </button>
+        </div>
       </div>
 
-      <table className="table-alocacoes">
+      <table className="table-alocacoes" style={{ width: '100%', borderCollapse: 'separate', borderSpacing: 0, background: '#fff', borderRadius: '10px', marginTop: '0.5rem', fontSize: '1rem' }}>
         <thead>
           <tr>
-            <th>Disciplina</th><th>Professor</th><th>Sala</th><th>Status</th>
-            <th>Ano</th><th>Semestre</th><th>Dia</th><th>Horário</th><th>Ações</th>
+            <th style={{ fontWeight: 600, background: '#f5f5f5', color: '#333', borderBottom: '2px solid #e0e0e0', padding: '0.85rem 1rem' }}>Disciplina</th>
+            <th style={{ fontWeight: 600, background: '#f5f5f5', color: '#333', borderBottom: '2px solid #e0e0e0', padding: '0.85rem 1rem' }}>Professor</th>
+            <th style={{ fontWeight: 600, background: '#f5f5f5', color: '#333', borderBottom: '2px solid #e0e0e0', padding: '0.85rem 1rem' }}>Sala</th>
+            <th style={{ fontWeight: 600, background: '#f5f5f5', color: '#333', borderBottom: '2px solid #e0e0e0', padding: '0.85rem 1rem' }}>Status</th>
+            <th style={{ fontWeight: 600, background: '#f5f5f5', color: '#333', borderBottom: '2px solid #e0e0e0', padding: '0.85rem 1rem' }}>Tipo</th>
+            <th style={{ fontWeight: 600, background: '#f5f5f5', color: '#333', borderBottom: '2px solid #e0e0e0', padding: '0.85rem 1rem' }}>Ano</th>
+            <th style={{ fontWeight: 600, background: '#f5f5f5', color: '#333', borderBottom: '2px solid #e0e0e0', padding: '0.85rem 1rem' }}>Semestre</th>
+            <th style={{ fontWeight: 600, background: '#f5f5f5', color: '#333', borderBottom: '2px solid #e0e0e0', padding: '0.85rem 1rem' }}>Dia</th>
+            <th style={{ fontWeight: 600, background: '#f5f5f5', color: '#333', borderBottom: '2px solid #e0e0e0', padding: '0.85rem 1rem' }}>Horário</th>
+            <th style={{ fontWeight: 600, background: '#f5f5f5', color: '#333', borderBottom: '2px solid #e0e0e0', padding: '0.85rem 1rem', textAlign: 'center' }}>Ações</th>
           </tr>
         </thead>
         <tbody>
           {alocacoesExibidas.map((alocacao) => (
-            <tr key={`${alocacao.numero_sala}-${alocacao.tipo_sala}-${alocacao.id_professor}-${alocacao.disciplina_nome}-${alocacao.disciplina_turno}-${alocacao.ano}-${alocacao.semestre_alocacao}`}>
-              <td>{alocacao.disciplina_nome}</td><td>{alocacao.professor_nome}</td>
-              <td>{alocacao.tipo_sala === 'sala' ? 'Sala ' : 'Lab '}{alocacao.numero_sala}</td>
-              <td>{alocacao.alocacao_status}</td><td>{alocacao.ano}</td>
-              <td>{alocacao.semestre_alocacao}</td>
-              <td>{diasSemanaConst.find(d => d.value === alocacao.dia_semana)?.label || ''}</td>
-              <td>{alocacao.hora_inicio ? alocacao.hora_inicio.substring(0, 5) : ''}</td>
-              <td className="coluna-acoes">
-                <button className="btn-acao-edit" onClick={() => handleEditarAlocacao(alocacao)}><FaEdit /></button>
-                <button className="btn-acao-delete" onClick={() => handleExcluirAlocacao(alocacao)}><FaTrash /></button>
+            <tr key={`${alocacao.numero_sala}-${alocacao.tipo_sala}-${alocacao.id_professor}-${alocacao.disciplina_nome}-${alocacao.disciplina_turno}-${alocacao.ano}-${alocacao.semestre_alocacao}`} style={{ transition: 'background 0.15s' }}>
+              <td style={{ borderBottom: '1px solid #f0f0f0', color: '#333', padding: '0.85rem 1rem' }}>{alocacao.disciplina_nome}</td>
+              <td style={{ borderBottom: '1px solid #f0f0f0', color: '#333', padding: '0.85rem 1rem' }}>{alocacao.professor_nome}</td>
+              <td style={{ borderBottom: '1px solid #f0f0f0', color: '#333', padding: '0.85rem 1rem' }}>{alocacao.tipo_sala === 'sala' ? 'Sala ' : 'Lab '}{alocacao.numero_sala}</td>
+              <td style={{ borderBottom: '1px solid #f0f0f0', color: '#333', padding: '0.85rem 1rem' }}>{alocacao.alocacao_status}</td>
+              <td style={{ borderBottom: '1px solid #f0f0f0', color: '#333', padding: '0.85rem 1rem' }}>{alocacao.tipo_alocacao === 'fixo' ? 'Fixo' : 'Esporádico'}</td>
+              <td style={{ borderBottom: '1px solid #f0f0f0', color: '#333', padding: '0.85rem 1rem' }}>{alocacao.ano}</td>
+              <td style={{ borderBottom: '1px solid #f0f0f0', color: '#333', padding: '0.85rem 1rem' }}>{alocacao.semestre_alocacao}</td>
+              <td style={{ borderBottom: '1px solid #f0f0f0', color: '#333', padding: '0.85rem 1rem' }}>{diasSemanaConst.find(d => d.value === alocacao.dia_semana)?.label || ''}</td>
+              <td style={{ borderBottom: '1px solid #f0f0f0', color: '#333', padding: '0.85rem 1rem' }}>{alocacao.hora_inicio ? alocacao.hora_inicio.substring(0, 5) : ''}</td>
+              <td className="coluna-acoes" style={{ display: 'flex', gap: '1.2rem', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
+                <button className="btn-acao-edit" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem', padding: '0.3rem', color: '#888', transition: 'color 0.18s, transform 0.18s' }} onClick={() => handleEditarAlocacao(alocacao)} onMouseOver={e => e.currentTarget.style.color = '#b20000'} onMouseOut={e => e.currentTarget.style.color = '#888'}><FaEdit /></button>
+                <button className="btn-acao-delete" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem', padding: '0.3rem', color: '#888', transition: 'color 0.18s, transform 0.18s' }} onClick={() => handleExcluirAlocacao(alocacao)} onMouseOver={e => e.currentTarget.style.color = '#b20000'} onMouseOut={e => e.currentTarget.style.color = '#888'}><FaTrash /></button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      
+
       {showEditModal && editingAlocacao && (
         <div className="modal-alocacoes-overlay">
           <div className="modal-alocacoes-content">
             <button className="modal-alocacoes-close-btn" onClick={handleCloseEditModal}>&times;</button>
             <h3>Alterar Sala da Alocação</h3>
-            <p className="readonly-input-alocacao-modal" style={{textAlign: 'center', marginBottom: '1rem'}}>
-                {`${editingAlocacao.disciplina_nome} - ${editingAlocacao.professor_nome}`}
+            <p className="readonly-input-alocacao-modal" style={{ textAlign: 'center', marginBottom: '1rem' }}>
+              {`${editingAlocacao.disciplina_nome} - ${editingAlocacao.professor_nome}`}
             </p>
             <div className="form-edit-alocacao-modal">
               <label>
