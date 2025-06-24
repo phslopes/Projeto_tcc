@@ -75,11 +75,13 @@ function SalasPage() {
     }
   };
 
-  const iniciarEdicao = (sala) => {
+  // Função para editar sala
+  const handleEditarSala = (sala) => {
     setSalaEditando({
-      ...sala,
-      oldNumber: sala.number,
-      oldType: sala.type,
+      oldNumber: sala.numero_sala,
+      oldType: sala.tipo_sala,
+      number: sala.numero_sala,
+      type: sala.tipo_sala,
     });
     setMostrarForm(true);
   };
@@ -104,7 +106,7 @@ function SalasPage() {
       ) : (
         <table className="table-salas">
           <thead>
-            <tr className="header-linha">
+            <tr>
               <th>Número</th>
               <th>Tipo</th>
               <th>Ações</th>
@@ -112,18 +114,24 @@ function SalasPage() {
           </thead>
           <tbody>
             {salas.map((d, index) => (
-              <tr key={`${d.numero_sala}-${d.tipo_sala}-${index}`} className="linha-sala">
-                <td className="coluna-centro">{d.numero_sala}</td>
-                <td className="coluna-centro">{d.tipo_sala}</td>
-                <td className="coluna-centro">
-                  <div className="botoes-acoes">
-                    <button className="btn-acao" onClick={() => iniciarEdicao({ number: d.numero_sala, type: d.tipo_sala })}>
-                      <FaEdit />
-                    </button>
-                    <button className="btn-acao" onClick={() => excluirSala({ number: d.numero_sala, type: d.tipo_sala })}>
-                      <FaTrash />
-                    </button>
-                  </div>
+              <tr key={`${d.numero_sala}-${d.tipo_sala}-${index}`}>
+                <td>{d.numero_sala}</td>
+                <td>{d.tipo_sala}</td>
+                <td className="coluna-acoes">
+                  <button
+                    className="btn-acao-edit"
+                    onClick={() => handleEditarSala(d)}
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    className="btn-acao-delete"
+                    onClick={() =>
+                      excluirSala({ number: d.numero_sala, type: d.tipo_sala })
+                    }
+                  >
+                    <FaTrash />
+                  </button>
                 </td>
               </tr>
             ))}

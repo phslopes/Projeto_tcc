@@ -5,14 +5,14 @@ import Salas from "./pages/salas";
 import Professores from "./pages/professores";
 import Disciplinas from "./pages/disciplinas";
 import Reserva from "./pages/reserva";
-import ProfDiscPage from "./pages/ProfessorDisc";  
-// import AssociacaoProfessorDisciplinaPage from "./pages/AssociacaoProfessorDisciplina/AssociacaoProfessorDisciplinaPage"; 
+import ReservaAdmin from "./pages/reservaAdmin";
+import AlocacoesPage from "./pages/alocacao/AlocacoesPage"; // Updated import
+import AssociacaoPage from "./pages/associacao/AssociacaoPage"; // Updated import
 import StudentDashboard from "./pages/Dashboard/student";
 import TeacherDashboard from "./pages/Dashboard/teacher";
 import AdminLayout from "./components/AdminLayout";
 import TeacherLayout from "./components/TeacherLayout";
 import PrivateRoute from "./components/PrivateRoute"; 
-import AlocacoesPage from "./pages/alocacao";
 
 
 function RoutesApp() {
@@ -27,9 +27,9 @@ function RoutesApp() {
             <Route path="professores" element={<Professores />} />
             <Route path="disciplinas" element={<Disciplinas />} />
             <Route path="salas" element={<Salas />} />
-            {/* <Route path="associacao-professor-disciplina" element={<AssociacaoProfessorDisciplinaPage />} />  */}
-            <Route path="ProfessorDisc" element={<ProfDiscPage />} />  
-            <Route path="alocacoes" element={<AlocacoesPage />} />   
+            <Route path="reservaAdmin" element={<ReservaAdmin />} />
+            <Route path="associacao" element={<AssociacaoPage />} /> {/* Updated route */}
+            <Route path="alocacoes" element={<AlocacoesPage />} />   {/* Updated route */}
             <Route path="*" element={<Navigate to="/admin" replace />} />
           </Route>
         </Route>
