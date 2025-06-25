@@ -4,8 +4,8 @@ import { api } from '../../utils/api';
 
 const horariosPorTurno = {
   "Manhã": ["08:00", "08:50", "09:40", "10:00", "10:40", "11:30"],
-  "Tarde": ["13:00", "13:50", "14:40", "15:00", "15:50", "16:40", "16:50", "17:40"],
-  "Noite": ["19:00", "19:50", "20:40", "21:00", "21:50"]
+  "Tarde": ["13:00", "13:50", "15:00", "15:50", "16:50", "17:40"],
+  "Noite": ["19:00", "19:50", "21:00", "21:50"]
 };
 
 export default function Reserva() {
@@ -262,7 +262,7 @@ export default function Reserva() {
       dia_semana: filtros.dia_semana,
     }))
     .filter(item => {
-      return item.nome && item.turno && item.horario && item.dia_semana;
+      return item.nome && item.turno && item.horario && item.dia_semana && (!filtros.tipo_sala || item.tipo_sala === filtros.tipo_sala);
     });
 
   if (loading) return <div>Carregando...</div>;
@@ -333,19 +333,6 @@ export default function Reserva() {
             {tiposSala.map(t => (
               <option key={t.value} value={t.value}>{t.label}</option>
             ))}
-          </select>
-        </div>
-        <div className="filtro">
-          <label>Sala</label>
-          <select name="numero_sala" value={filtros.numero_sala} onChange={handleFiltroChange} disabled={!filtros.horario}>
-            <option value="">Selecione</option>
-            {salasDisponiveis
-              .filter(s => !filtros.tipo_sala || s.tipo_sala === filtros.tipo_sala)
-              .map(s => (
-                <option key={s.numero_sala + '-' + s.tipo_sala} value={s.numero_sala}>
-                  {s.numero_sala} ({s.tipo_sala})
-                </option>
-              ))}
           </select>
         </div>
       </div>

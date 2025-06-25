@@ -72,7 +72,7 @@ export default function AlocacaoFIltro() {
         <div className="filtro">
           <label>Curso</label>
           <select name="curso" value={filtros.curso} onChange={handleFiltroChange}>
-            <option value="">Todos</option>
+            <option value="" disabled>Selecione um Curso</option>
             {cursos.map(curso => (
               <option key={curso} value={curso}>
                 {curso === 'ADS_FIXED_NO_FILTER' ? 'ADS' : curso}
@@ -84,7 +84,7 @@ export default function AlocacaoFIltro() {
         <div className="filtro">
           <label>Turno</label>
           <select name="turno" value={filtros.turno} onChange={handleFiltroChange}>
-            <option value="">Todos</option>
+            <option value="" disabled>Selecione um Turno</option>
             {turnos.map(turno => (
               <option key={turno} value={turno}>{turno}</option>
             ))}
@@ -93,7 +93,7 @@ export default function AlocacaoFIltro() {
         <div className="filtro">
           <label>Semestre</label>
           <select name="semestre" value={filtros.semestre} onChange={handleFiltroChange}>
-            <option value="">Todos</option>
+            <option value="" disabled>Selecione um Semestre</option>
             {semestres.map(semestre => (
               <option key={semestre} value={semestre}>{semestre}</option>
             ))}
