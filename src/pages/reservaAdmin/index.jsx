@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './ReservaPage.css';
 import { api } from '../../utils/api';
 
-function ConfirmPopup({ open, onClose, onConfirm, professorEmail }) {
+function ConfirmPopup({ open, onClose, onConfirm, popupMode, professorEmail }) {
   const [step, setStep] = useState(0);
   React.useEffect(() => { if (open) setStep(0); }, [open]);
   if (!open) return null;
@@ -11,17 +11,17 @@ function ConfirmPopup({ open, onClose, onConfirm, professorEmail }) {
       <div className="popup" style={{ minWidth: 320, padding: '2rem 2.5rem', borderRadius: 14, boxShadow: '0 4px 24px rgba(0,0,0,0.13)', textAlign: 'center', position: 'relative' }}>
         {step === 0 ? (
           <>
-            <div style={{ fontSize: 38, color: '#4caf50', marginBottom: 10 }}>
-              <span role="img" aria-label="confirmação">✔️</span>
+            <div style={{ fontSize: 38, color: popupMode === 'delete' ? '#f44336' : '#4caf50', marginBottom: 10 }}>
+              <span role="img" aria-label={popupMode === 'delete' ? 'exclusão' : 'confirmação'}>{popupMode === 'delete' ? '🗑️' : '✔️'}</span>
             </div>
-            <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 10 }}>Confirmar Reserva</h3>
-            <p style={{ fontSize: 16, color: '#333', marginBottom: 8 }}>Tem certeza que deseja confirmar esta reserva?</p>
+            <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 10 }}>{popupMode === 'delete' ? 'Excluir Reserva' : 'Confirmar Reserva'}</h3>
+            <p style={{ fontSize: 16, color: '#333', marginBottom: 8 }}>{popupMode === 'delete' ? 'Tem certeza que deseja excluir esta reserva? Esta ação não poderá ser desfeita.' : 'Tem certeza que deseja confirmar esta reserva?'}</p>
             <div style={{ marginTop: 18, display: 'flex', justifyContent: 'center', gap: 16 }}>
               <button
                 onClick={async () => { await onConfirm(); setStep(1); }}
-                style={{ background: '#4caf50', color: 'white', border: 'none', padding: '10px 28px', borderRadius: 6, fontWeight: 600, fontSize: 16, cursor: 'pointer', boxShadow: '0 2px 8px rgba(76,175,80,0.08)' }}
+                style={{ background: popupMode === 'delete' ? '#f44336' : '#4caf50', color: 'white', border: 'none', padding: '10px 28px', borderRadius: 6, fontWeight: 600, fontSize: 16, cursor: 'pointer', boxShadow: popupMode === 'delete' ? '0 2px 8px rgba(244,67,54,0.08)' : '0 2px 8px rgba(76,175,80,0.08)' }}
               >
-                Sim, confirmar
+                {popupMode === 'delete' ? 'Sim, excluir' : 'Sim, confirmar'}
               </button>
               <button
                 onClick={onClose}
@@ -33,12 +33,12 @@ function ConfirmPopup({ open, onClose, onConfirm, professorEmail }) {
           </>
         ) : (
           <>
-            <div style={{ fontSize: 38, color: '#4caf50', marginBottom: 10 }}>
-              <span role="img" aria-label="confirmação">✔️</span>
+            <div style={{ fontSize: 38, color: popupMode === 'delete' ? '#f44336' : '#4caf50', marginBottom: 10 }}>
+              <span role="img" aria-label={popupMode === 'delete' ? 'exclusão' : 'confirmação'}>{popupMode === 'delete' ? '🗑️' : '✔️'}</span>
             </div>
-            <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 10 }}>Reserva confirmada!</h3>
-            <p style={{ fontSize: 16, color: '#333', marginBottom: 8 }}>Um e-mail foi enviado para o professor{professorEmail ? ` (${professorEmail})` : ''}.</p>
-            <button onClick={onClose} style={{ marginTop: 16, padding: '10px 28px', borderRadius: 6, background: '#4caf50', color: 'white', border: 'none', fontWeight: 600, fontSize: 16, boxShadow: '0 2px 8px rgba(76,175,80,0.08)', cursor: 'pointer' }}>OK</button>
+            <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 10 }}>{popupMode === 'delete' ? 'Reserva excluída!' : 'Reserva confirmada!'}</h3>
+            <p style={{ fontSize: 16, color: '#333', marginBottom: 8 }}>{popupMode === 'delete' ? 'A reserva foi excluída com sucesso.' : `Um e-mail foi enviado para o professor${professorEmail ? ` (${professorEmail})` : ''}.`}</p>
+            <button onClick={onClose} style={{ marginTop: 16, padding: '10px 28px', borderRadius: 6, background: popupMode === 'delete' ? '#f44336' : '#4caf50', color: 'white', border: 'none', fontWeight: 600, fontSize: 16, boxShadow: popupMode === 'delete' ? '0 2px 8px rgba(244,67,54,0.08)' : '0 2px 8px rgba(76,175,80,0.08)', cursor: 'pointer' }}>OK</button>
           </>
         )}
       </div>
@@ -53,6 +53,7 @@ export default function ReservaAdmin() {
   const [updatingStatus, setUpdatingStatus] = useState(null);
   const [popupOpen, setPopupOpen] = useState(false);
   const [popupItem, setPopupItem] = useState(null);
+  const [popupMode, setPopupMode] = useState('confirm');
 
   const diasSemana = [
     { value: 2, label: 'Segunda-feira' },
@@ -197,17 +198,17 @@ export default function ReservaAdmin() {
                 </td>
                 <td>
                   <button
-                    onClick={() => { setPopupItem(item); setPopupOpen(true); }}
+                    onClick={() => { setPopupItem(item); setPopupMode('confirm'); setPopupOpen(true); }}
                     disabled={updatingStatus === item.numero_sala + '-' + item.tipo_sala || item.alocacao_status === 'confirmada'}
                     style={{
                       backgroundColor: '#4caf50', color: 'white', border: 'none', borderRadius: 4, padding: '4px 10px', marginRight: 8, fontWeight: 'bold', cursor: item.alocacao_status === 'confirmada' ? 'not-allowed' : 'pointer'
                     }}
                   >Confirmar</button>
                   <button
-                    onClick={() => handleStatusChange(item, 'cancelada')}
-                    disabled={updatingStatus === item.numero_sala + '-' + item.tipo_sala || item.alocacao_status === 'cancelada'}
+                    onClick={() => { setPopupItem(item); setPopupMode('delete'); setPopupOpen(true); }}
+                    disabled={updatingStatus === item.numero_sala + '-' + item.tipo_sala}
                     style={{
-                      backgroundColor: '#f44336', color: 'white', border: 'none', borderRadius: 4, padding: '4px 10px', fontWeight: 'bold', cursor: item.alocacao_status === 'cancelada' ? 'not-allowed' : 'pointer'
+                      backgroundColor: '#f44336', color: 'white', border: 'none', borderRadius: 4, padding: '4px 10px', fontWeight: 'bold', cursor: 'pointer'
                     }}
                   >Cancelar</button>
                   {updatingStatus === item.numero_sala + '-' + item.tipo_sala && (
@@ -229,8 +230,29 @@ export default function ReservaAdmin() {
         open={popupOpen}
         onClose={() => { setPopupOpen(false); setPopupItem(null); }}
         onConfirm={async () => {
-          if (popupItem) await handleStatusChange(popupItem, 'confirmada');
+          if (popupItem && popupMode === 'confirm') await handleStatusChange(popupItem, 'confirmada');
+          if (popupItem && popupMode === 'delete') {
+            try {
+              await api.delete(`/allocations/${popupItem.numero_sala}/${popupItem.tipo_sala}/${popupItem.id_professor}/${popupItem.disciplina_nome}/${popupItem.disciplina_turno}/${popupItem.ano}/${popupItem.semestre_alocacao}`);
+              setAllocations(prev => prev.filter(item =>
+                !(
+                  item.numero_sala === popupItem.numero_sala &&
+                  item.tipo_sala === popupItem.tipo_sala &&
+                  item.id_professor === popupItem.id_professor &&
+                  item.disciplina_nome === popupItem.disciplina_nome &&
+                  item.disciplina_turno === popupItem.disciplina_turno &&
+                  item.ano === popupItem.ano &&
+                  item.semestre_alocacao === popupItem.semestre_alocacao
+                )
+              ));
+              setPopupOpen(false);
+              setPopupItem(null);
+            } catch (err) {
+              setError('Erro ao excluir reserva: ' + err.message);
+            }
+          }
         }}
+        popupMode={popupMode}
         professorEmail={popupItem?.professor_email || ''}
       />
     </div>

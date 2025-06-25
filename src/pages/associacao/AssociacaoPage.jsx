@@ -454,7 +454,12 @@ function AssociacaoPage() {
                     if (!formTurnoDisciplina || !formProfessorId || !formDiaSemana) {
                       return <option value="" disabled>Preencha os outros campos</option>;
                     }
-                    let horariosDisponiveis = [...(horariosPorTurno[formTurnoDisciplina] || [])];
+                    let horariosDisponiveis;
+                    if (formTurnoDisciplina === 'Noite' && parseInt(formDiaSemana) === 7) {
+                      horariosDisponiveis = [...(horariosPorTurno['Manhã'] || [])];
+                    } else {
+                      horariosDisponiveis = [...(horariosPorTurno[formTurnoDisciplina] || [])];
+                    }
                     const ano = parseInt(formAnoSemestre.substring(0, 4));
                     const semestre = parseInt(formAnoSemestre.substring(4, 5));
                     const disciplinaSelecionadaInfo = disciplinas.find(d => d.nome === formDisciplinaNome && d.turno === formTurnoDisciplina);
