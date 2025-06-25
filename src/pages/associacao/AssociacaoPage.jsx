@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import "./AssociacaoPage.css";
-import { api } from "../../utils/api"; 
+import { api } from "../../utils/api";
 
 const horariosPorTurno = {
-  "Manhã": ["08:00", "08:50", "09:40", "10:00", "10:40", "11:30"], 
-  "Tarde": ["13:00", "13:50", "14:40", "15:00", "15:50", "16:40", "16:50", "17:40"],
-  "Noite": ["19:00", "19:50", "20:40", "21:00", "21:50"]
+  "Manhã": ["08:00", "08:50", "09:40", "10:00", "10:40", "11:30"],
+  "Tarde": ["13:00", "13:50", "15:00", "15:50", "16:50", "17:40"],
+  "Noite": ["19:00", "19:50", "21:00", "21:50"]
 };
 
-const diasSemanaConst = [ 
+const diasSemanaConst = [
   { value: 2, label: 'Segunda-feira' },
   { value: 3, label: 'Terça-feira' },
   { value: 4, label: 'Quarta-feira' },
@@ -59,7 +59,7 @@ function AssociacaoPage() {
   const [formDiaSemana, setFormDiaSemana] = useState("");
   const [formHorario, setFormHorario] = useState("");
 
-  const fetchAssociacoes = useCallback(async (currentFilters) => { 
+  const fetchAssociacoes = useCallback(async (currentFilters) => {
     setLoading(true);
     setError(null);
     try {
@@ -69,7 +69,7 @@ function AssociacaoPage() {
         turno: currentFilters.filtroTurno,
         semestreCurso: currentFilters.filtroSemestreCurso
       };
-      const fetchedAssociations = await api.get('/professor-disciplines', { params }); 
+      const fetchedAssociations = await api.get('/professor-disciplines', { params });
       setDisplayAssociacoes(fetchedAssociations);
     } catch (err) {
       setError(err.message || 'Erro ao carregar associações.');
@@ -77,7 +77,7 @@ function AssociacaoPage() {
     } finally {
       setLoading(false);
     }
-  }, []); 
+  }, []);
 
   const fetchDropdownData = useCallback(async () => {
     try {
@@ -89,8 +89,8 @@ function AssociacaoPage() {
 
       const cursos = [...new Set(fetchedDiscs.map(d => d.curso))];
       const turnos = [...new Set(fetchedDiscs.map(d => d.turno))];
-      const semestres = [...new Set(fetchedDiscs.map(d => d.semestre_curso))].sort((a,b) => a-b);
-      
+      const semestres = [...new Set(fetchedDiscs.map(d => d.semestre_curso))].sort((a, b) => a - b);
+
       setCursosUnicos(cursos);
       setTurnosUnicos(turnos);
       setSemestresCursoUnicos(semestres);
@@ -127,7 +127,7 @@ function AssociacaoPage() {
         setFormTurnoDisciplina(associacaoEditando.disciplina_turno || "");
         setFormAnoSemestre(`${associacaoEditando.ano}${associacaoEditando.semestre_alocacao}` || "");
         setFormDiaSemana(String(associacaoEditando.dia_semana) || "");
-        setFormHorario(associacaoEditando.hora_inicio.substring(0,5) || "");
+        setFormHorario(associacaoEditando.hora_inicio.substring(0, 5) || "");
       } else {
         setFormProfessorId("");
         setFormDisciplinaNome("");
@@ -146,16 +146,16 @@ function AssociacaoPage() {
 
   const handleEditarAssociacao = (associacao) => {
     setAssociacaoEditando({
-        ...associacao,
-        oldIdProfessor: associacao.id_professor,
-        oldNomeDisc: associacao.disciplina_nome,
-        oldTurnoDisc: associacao.disciplina_turno,
-        oldAno: associacao.ano,
-        oldSemestreAlocacao: associacao.semestre_alocacao
+      ...associacao,
+      oldIdProfessor: associacao.id_professor,
+      oldNomeDisc: associacao.disciplina_nome,
+      oldTurnoDisc: associacao.disciplina_turno,
+      oldAno: associacao.ano,
+      oldSemestreAlocacao: associacao.semestre_alocacao
     });
     setMostrarModal(true);
   };
-  
+
   const handleCloseModal = () => {
     setMostrarModal(false);
     setAssociacaoEditando(null);
@@ -178,13 +178,13 @@ function AssociacaoPage() {
     const semestre_alocacao = parseInt(formAnoSemestre.substring(4, 5));
 
     const payload = {
-        id_professor: parseInt(formProfessorId),
-        nome: formDisciplinaNome,
-        turno: formTurnoDisciplina,
-        ano,
-        semestre_alocacao,
-        dia_semana: parseInt(formDiaSemana),
-        hora_inicio: formHorario
+      id_professor: parseInt(formProfessorId),
+      nome: formDisciplinaNome,
+      turno: formTurnoDisciplina,
+      ano,
+      semestre_alocacao,
+      dia_semana: parseInt(formDiaSemana),
+      hora_inicio: formHorario
     };
 
     try {
@@ -197,7 +197,7 @@ function AssociacaoPage() {
         alert('Associação criada com sucesso!');
       }
       handleCloseModal();
-      fetchAssociacoes({ 
+      fetchAssociacoes({
         filtroAnoSemestre,
         filtroCurso,
         filtroTurno,
@@ -245,22 +245,22 @@ function AssociacaoPage() {
     const targetAnoSemestre = currentAnoSemestre;
 
     if (window.confirm(`Deseja copiar as associações do semestre ${sourceAnoSemestre} para o semestre atual ${targetAnoSemestre}?`)) {
-        try {
-            const response = await api.post('/professor-disciplines/copy', {
-                sourceAnoSemestre: sourceAnoSemestre,
-                targetAnoSemestre: targetAnoSemestre
-            });
-            alert(response.message);
-            fetchAssociacoes({
-              filtroAnoSemestre,
-              filtroCurso,
-              filtroTurno,
-              filtroSemestreCurso
-            });
-        } catch (err) {
-            console.error("Erro ao copiar associações:", err);
-            alert(err.message || "Ocorreu um erro ao copiar.");
-        }
+      try {
+        const response = await api.post('/professor-disciplines/copy', {
+          sourceAnoSemestre: sourceAnoSemestre,
+          targetAnoSemestre: targetAnoSemestre
+        });
+        alert(response.message);
+        fetchAssociacoes({
+          filtroAnoSemestre,
+          filtroCurso,
+          filtroTurno,
+          filtroSemestreCurso
+        });
+      } catch (err) {
+        console.error("Erro ao copiar associações:", err);
+        alert(err.message || "Ocorreu um erro ao copiar.");
+      }
     }
   };
 
@@ -276,7 +276,7 @@ function AssociacaoPage() {
     <div className="container-associacao">
       <div className="header-associacao">
         <h2>Associação Professor-Disciplina</h2>
-        <button className="btn-add-associacao" onClick={handleNovaAssociacao}>
+        <button className="btn-add" onClick={handleNovaAssociacao}>
           NOVA ASSOCIAÇÃO
         </button>
       </div>
@@ -318,11 +318,11 @@ function AssociacaoPage() {
             ))}
           </select>
         </label>
-        <button className="btn-aplicar-filtros" onClick={handleAplicarFiltros}>Aplicar</button>
+        <button className="btn-aplicar-filtros" onClick={handleAplicarFiltros}>APLICAR</button>
       </div>
 
       <div className="table-and-copy-container">
-        <table className="table-associacoes">
+        <table className="table-associacao">
           <thead>
             <tr>
               <th>Professor</th>
@@ -362,24 +362,22 @@ function AssociacaoPage() {
           </tbody>
         </table>
         <div className="copy-button-wrapper">
-             <button className="btn-copy-assoc" onClick={handleCopiarAssociacao}>
-                COPIAR ASSOCIAÇÃO
-             </button>
+          <button className="btn-copy-assoc" onClick={handleCopiarAssociacao}>
+            COPIAR ASSOCIAÇÃO
+          </button>
         </div>
       </div>
 
       {mostrarModal && (
-        <div className="modal-associacao-overlay">
-          <div className="modal-associacao-content">
-            <button className="modal-associacao-close-btn" onClick={handleCloseModal}>
-              &times;
-            </button>
-            <h3>{associacaoEditando ? "Editar Associação" : "Nova Associação"}</h3>
-            <form onSubmit={handleSalvarAssociacaoForm} className="form-associacao">
-              <label className="form-associacao-label">
-                Professor:
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-lg relative p-6">
+            <button className="absolute right-4 top-4 text-2xl font-bold" onClick={handleCloseModal}>&times;</button>
+            <h3 className="text-xl font-bold text-center mb-4 mt-2">{associacaoEditando ? "Editar Associação" : "Nova Associação"}</h3>
+            <form onSubmit={handleSalvarAssociacaoForm} className="flex flex-col gap-4">
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-1">Professor:</label>
                 <select
-                  className="form-associacao-select"
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-red-700"
                   value={formProfessorId}
                   onChange={(e) => setFormProfessorId(e.target.value)}
                 >
@@ -390,12 +388,11 @@ function AssociacaoPage() {
                     </option>
                   ))}
                 </select>
-              </label>
-
-              <label className="form-associacao-label">
-                Disciplina:
+              </div>
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-1">Disciplina:</label>
                 <select
-                  className="form-associacao-select"
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-red-700"
                   value={formDisciplinaNome && formTurnoDisciplina ? `${formDisciplinaNome}|${formTurnoDisciplina}` : ""}
                   onChange={(e) => {
                     const [nome, turno] = e.target.value.split('|');
@@ -406,36 +403,34 @@ function AssociacaoPage() {
                   <option value="">Selecione a Disciplina</option>
                   {disciplinas
                     .filter(d => (
-                        (!filtroCurso || d.curso === filtroCurso) &&
-                        (!filtroTurno || d.turno === filtroTurno) &&
-                        (!filtroSemestreCurso || String(d.semestre_curso) === filtroSemestreCurso)
-                      ))
+                      (!filtroCurso || d.curso === filtroCurso) &&
+                      (!filtroTurno || d.turno === filtroTurno) &&
+                      (!filtroSemestreCurso || String(d.semestre_curso) === filtroSemestreCurso)
+                    ))
                     .map((d) => (
-                    <option key={`${d.nome}-${d.turno}`} value={`${d.nome}|${d.turno}`}>
-                      {d.nome} ({d.curso} - {d.turno} - {d.semestre_curso}º Sem)
-                    </option>
-                  ))}
+                      <option key={`${d.nome}-${d.turno}`} value={`${d.nome}|${d.turno}`}>
+                        {d.nome} ({d.curso} - {d.turno} - {d.semestre_curso}º Sem)
+                      </option>
+                    ))}
                 </select>
-              </label>
-
-              <label className="form-associacao-label">
-                Ano/Semestre (Alocação):
+              </div>
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-1">Ano/Semestre (Alocação):</label>
                 <select
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-red-700"
                   value={formAnoSemestre}
                   onChange={(e) => setFormAnoSemestre(e.target.value)}
-                  className="form-associacao-select"
                 >
                   <option value="">Selecione</option>
                   {yearsSemestersOptions.map((yearSem) => (
                     <option key={yearSem} value={yearSem}>{yearSem}</option>
                   ))}
                 </select>
-              </label>
-
-              <label className="form-associacao-label">
-                Dia da Semana:
+              </div>
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-1">Dia da Semana:</label>
                 <select
-                  className="form-associacao-select"
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-red-700"
                   value={formDiaSemana}
                   onChange={(e) => setFormDiaSemana(e.target.value)}
                 >
@@ -446,72 +441,59 @@ function AssociacaoPage() {
                     </option>
                   ))}
                 </select>
-              </label>
-              
-              <label className="form-associacao-label">
-                Horário:
+              </div>
+              <div>
+                <label className="block text-base font-medium text-gray-700 mb-1">Horário:</label>
                 <select
-                  className="form-associacao-select"
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-red-700"
                   value={formHorario}
                   onChange={(e) => setFormHorario(e.target.value)}
                 >
                   <option value="">Selecione o Horário</option>
                   {(() => {
-                      if (!formTurnoDisciplina || !formProfessorId || !formDiaSemana) {
-                          return <option value="" disabled>Preencha os outros campos</option>;
-                      }
-
-                      let horariosDisponiveis = [...(horariosPorTurno[formTurnoDisciplina] || [])];
-                      const ano = parseInt(formAnoSemestre.substring(0, 4));
-                      const semestre = parseInt(formAnoSemestre.substring(4, 5));
-
-                      const disciplinaSelecionadaInfo = disciplinas.find(d => d.nome === formDisciplinaNome && d.turno === formTurnoDisciplina);
-                      if (!disciplinaSelecionadaInfo) {
-                        return <option value="" disabled>Selecione uma disciplina válida</option>;
-                      }
-                      
-                      const { curso: cursoSelecionado, semestre_curso: semestreCursoSelecionado } = disciplinaSelecionadaInfo;
-
-                      const associacoesConflitantes = displayAssociacoes.filter(assoc => {
-                          const infoDisciplinaExistente = disciplinas.find(d => d.nome === assoc.disciplina_nome && d.turno === assoc.disciplina_turno);
-                          
-                          const conflitoProfessor = assoc.id_professor === parseInt(formProfessorId);
-                          const conflitoTurma = infoDisciplinaExistente?.curso === cursoSelecionado && infoDisciplinaExistente?.semestre_curso === semestreCursoSelecionado;
-
-                          return (conflitoProfessor || conflitoTurma) &&
-                                 assoc.dia_semana === parseInt(formDiaSemana) &&
-                                 assoc.ano === ano &&
-                                 assoc.semestre_alocacao === semestre;
-                      });
-                      
-                      const uniqueConflitos = [...new Map(associacoesConflitantes.map(item => [JSON.stringify(item), item])).values()];
-
-                      uniqueConflitos.forEach(assoc => {
-                          const disciplinaDaAssociacao = disciplinas.find(d => d.nome === assoc.disciplina_nome && d.turno === assoc.disciplina_turno);
-                          if (!disciplinaDaAssociacao) return;
-
-                          const carga = disciplinaDaAssociacao.carga || 1;
-                          const horaInicio = assoc.hora_inicio.substring(0, 5);
-                          const startIndex = horariosPorTurno[formTurnoDisciplina]?.indexOf(horaInicio);
-
-                          if (startIndex > -1) {
-                              for (let i = 0; i < carga; i++) {
-                                  const indexToRemove = startIndex + i;
-                                  if (indexToRemove < horariosPorTurno[formTurnoDisciplina].length) {
-                                       horariosDisponiveis[indexToRemove] = null;
-                                  }
-                              }
+                    if (!formTurnoDisciplina || !formProfessorId || !formDiaSemana) {
+                      return <option value="" disabled>Preencha os outros campos</option>;
+                    }
+                    let horariosDisponiveis = [...(horariosPorTurno[formTurnoDisciplina] || [])];
+                    const ano = parseInt(formAnoSemestre.substring(0, 4));
+                    const semestre = parseInt(formAnoSemestre.substring(4, 5));
+                    const disciplinaSelecionadaInfo = disciplinas.find(d => d.nome === formDisciplinaNome && d.turno === formTurnoDisciplina);
+                    if (!disciplinaSelecionadaInfo) {
+                      return <option value="" disabled>Selecione uma disciplina válida</option>;
+                    }
+                    const { curso: cursoSelecionado, semestre_curso: semestreCursoSelecionado } = disciplinaSelecionadaInfo;
+                    const associacoesConflitantes = displayAssociacoes.filter(assoc => {
+                      const infoDisciplinaExistente = disciplinas.find(d => d.nome === assoc.disciplina_nome && d.turno === assoc.disciplina_turno);
+                      const conflitoProfessor = assoc.id_professor === parseInt(formProfessorId);
+                      const conflitoTurma = infoDisciplinaExistente?.curso === cursoSelecionado && infoDisciplinaExistente?.semestre_curso === semestreCursoSelecionado;
+                      return (conflitoProfessor || conflitoTurma) &&
+                        assoc.dia_semana === parseInt(formDiaSemana) &&
+                        assoc.ano === ano &&
+                        assoc.semestre_alocacao === semestre;
+                    });
+                    const uniqueConflitos = [...new Map(associacoesConflitantes.map(item => [JSON.stringify(item), item])).values()];
+                    uniqueConflitos.forEach(assoc => {
+                      const disciplinaDaAssociacao = disciplinas.find(d => d.nome === assoc.disciplina_nome && d.turno === assoc.disciplina_turno);
+                      if (!disciplinaDaAssociacao) return;
+                      const carga = disciplinaDaAssociacao.carga || 1;
+                      const horaInicio = assoc.hora_inicio.substring(0, 5);
+                      const startIndex = horariosPorTurno[formTurnoDisciplina]?.indexOf(horaInicio);
+                      if (startIndex > -1) {
+                        for (let i = 0; i < carga; i++) {
+                          const indexToRemove = startIndex + i;
+                          if (indexToRemove < horariosPorTurno[formTurnoDisciplina].length) {
+                            horariosDisponiveis[indexToRemove] = null;
                           }
-                      });
-
-                      return horariosDisponiveis.filter(h => h !== null).map((horario) => (
-                        <option key={horario} value={horario}>{horario}</option>
-                      ));
+                        }
+                      }
+                    });
+                    return horariosDisponiveis.filter(h => h !== null).map((horario) => (
+                      <option key={horario} value={horario}>{horario}</option>
+                    ));
                   })()}
                 </select>
-              </label>
-
-              <button type="submit" className="btn-submit-associacao">
+              </div>
+              <button type="submit" className="w-full mt-2 bg-red-600 text-white py-2 rounded font-bold hover:bg-red-700 transition-all">
                 SALVAR ASSOCIAÇÃO
               </button>
             </form>

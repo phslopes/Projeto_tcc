@@ -66,8 +66,6 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
               onChange={(e) => setNome(e.target.value)}
               placeholder="Nome da disciplina"
               className="mt-1 p-2 border border-gray-300 rounded"
-              // ReadOnly se estiver editando (PK não editável diretamente no form para evitar confusão)
-              readOnly={!!initialData}
             />
           </label>
 
@@ -77,7 +75,6 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
               value={turno}
               onChange={(e) => setTurno(e.target.value)}
               className="mt-1 p-2 border border-gray-300 rounded"
-              disabled={!!initialData} // Desabilita se estiver editando
             >
               <option value="">Selecione</option>
               <option value="Manhã">Manhã</option>

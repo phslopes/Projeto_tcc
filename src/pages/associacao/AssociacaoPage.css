@@ -1,6 +1,8 @@
 .container-associacao {
-  padding: 2rem;
-  font-family: 'Arial', sans-serif;
+  padding: 2rem 1.5rem;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #fafbfc;
+  min-height: 100vh;
 }
 
 .header-associacao {
@@ -8,29 +10,33 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .header-associacao h2 {
-  font-size: 1.5rem;
-  font-weight: bold;
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: #333;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.3rem;
 }
 
-.btn-add-associacao {
-  background-color: #b30000;
+.btn-add {
+  background-color: #b20000;
   border: none;
-  padding: 10px 20px;
+  padding: 0.6rem 1.2rem;
   color: white;
-  font-weight: bold;
-  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
   border-radius: 5px;
-  transition: background-color 0.3s ease;
+  cursor: pointer;
+  transition: background 0.18s;
 }
 
-.btn-add-associacao:hover {
-  background-color: #530301;
+.btn-add:hover {
+  background-color: #333;
 }
 
-/* Estilos para o container de filtros */
 .filtros-container {
   display: flex;
   gap: 1rem;
@@ -46,60 +52,60 @@
 .filtros-container label {
   display: flex;
   flex-direction: column;
-  font-size: 0.9rem;
+  font-size: 0.97rem;
   font-weight: 500;
   color: #333;
 }
 
-.filtros-container input,
 .filtros-container select {
   padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 1.2px solid #ccc;
+  border-radius: 5px;
   margin-top: 0.25rem;
   min-width: 120px;
+  font-size: 1rem;
 }
 
 .btn-aplicar-filtros {
-  background-color: #ffa600;
+  background-color: #b20000;
   border: none;
   padding: 0.6rem 1.2rem;
   color: white;
-  font-weight: bold;
-  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
   border-radius: 5px;
-  transition: background-color 0.3s ease;
+  cursor: pointer;
+  transition: background 0.18s;
   height: 38px;
 }
 
 .btn-aplicar-filtros:hover {
-  background-color: #e69500;
+  background-color: #333;
 }
 
-/* Novo container para a tabela e o botão de copiar */
 .table-and-copy-container {
   display: flex;
-  flex-direction: column; /* Para empilhar tabela e wrapper do botão */
+  flex-direction: column;
   gap: 1rem;
 }
 
-/* Wrapper para posicionar o botão de copiar no canto inferior direito */
 .copy-button-wrapper {
   display: flex;
-  justify-content: flex-end; /* Alinha o botão à direita */
-  width: 100%; /* Garante que o wrapper ocupe toda a largura */
-  margin-top: 1rem; /* Espaçamento entre a tabela e o botão */
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 1rem;
 }
 
 .btn-copy-assoc {
-  background-color: #b30000;
+  background-color: #b20000;
   border: none;
   padding: 0.8rem 1.5rem;
   color: white;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
   border-radius: 5px;
-  transition: background-color 0.3s ease;
+  transition: background 0.18s;
   white-space: nowrap;
 }
 
@@ -107,39 +113,54 @@
   background-color: #8c0000;
 }
 
-.table-associacoes {
+.table-associacao {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 1rem;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 10px;
+  margin-top: 0.5rem;
+  font-size: 1rem;
 }
 
-.table-associacoes th,
-.table-associacoes td {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid #eee;
+.table-associacao th,
+.table-associacao td {
+  padding: 0.85rem 1rem;
   text-align: left;
 }
 
-.table-associacoes th {
-  background: #f9f9f9;
-  color: #333;
+.table-associacao th {
   font-weight: 600;
+  background: #f5f5f5;
+  color: #333;
+  border-bottom: 2px solid #e0e0e0;
 }
 
-.table-associacoes td {
+.table-associacao tr {
+  transition: background 0.15s;
+}
+
+.table-associacao tbody tr:hover {
+  background: #f7eaea;
+}
+
+.table-associacao td {
+  border-bottom: 1px solid #f0f0f0;
   color: #333;
 }
 
-.table-associacoes th:last-child,
-.table-associacoes td:last-child {
+.table-associacao tr:last-child td {
+  border-bottom: none;
+}
+
+.table-associacao th:last-child,
+.table-associacao td:last-child {
   text-align: center;
 }
 
 .coluna-acoes {
   display: flex;
-  gap: 1rem;
+  gap: 1.2rem;
   justify-content: center;
   align-items: center;
 }
@@ -151,121 +172,111 @@
   cursor: pointer;
   font-size: 1.1rem;
   padding: 0.3rem;
-  transition: color 0.2s ease-in-out;
+  transition: color 0.18s, transform 0.18s;
 }
 
 .btn-acao-edit {
-  color: gray;
+  color: #888;
 }
+
 .btn-acao-edit:hover {
-  color: black;
+  color: #b20000;
+  transform: scale(1.15);
 }
 
 .btn-acao-delete {
-  color: gray;
-}
-.btn-acao-delete:hover {
-  color: black;
+  color: #888;
 }
 
-.modal-associacao-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.btn-acao-delete:hover {
+  color: #b20000;
+  transform: scale(1.15);
+}
+
+/* Modal de cadastro de associação */
+.fixed.inset-0.bg-black.bg-opacity-40.flex {
+  background: rgba(0, 0, 0, 0.25) !important;
   z-index: 1000;
 }
 
-.modal-associacao-content {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  width: 90%;
-  max-width: 450px;
-  position: relative;
-  animation: fadeInModal 0.3s ease-out;
+.bg-white.rounded-xl.shadow-lg {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.10) !important;
+  padding: 2rem 1.2rem !important;
 }
 
-@keyframes fadeInModal {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.modal-associacao-close-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1.5rem;
-  font-size: 1.8rem;
-  font-weight: bold;
-  color: #555;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-.modal-associacao-close-btn:hover {
-  color: #000;
-}
-
-.modal-associacao-content h3 {
-  font-size: 1.4rem;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  color: #333;
-}
-
-.form-associacao {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.form-associacao-label {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.9rem;
+.flex.flex-col.space-y-4 label {
+  font-size: 1rem;
   font-weight: 500;
   color: #333;
 }
 
-.form-associacao-select,
-.form-associacao-input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 6px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.btn-submit-associacao {
-  display: block;
-  width: 100%;
-  padding: 0.8rem;
-  margin-top: 1.5rem;
-  background-color: #b30000;
-  color: white;
-  font-weight: bold;
-  border: none;
+.flex.flex-col.space-y-4 input,
+.flex.flex-col.space-y-4 select {
   border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-  text-transform: uppercase;
+  border: 1.2px solid #ccc;
+  padding: 0.65rem;
+  font-size: 1rem;
+  margin-top: 0.2rem;
+  transition: border 0.18s;
 }
 
-.btn-submit-associacao:hover {
-  background-color: #8c0000;
+.flex.flex-col.space-y-4 input:focus,
+.flex.flex-col.space-y-4 select:focus {
+  border: 1.2px solid #b20000;
+  outline: none;
+}
+
+.w-full.mt-2.bg-red-600.text-white.py-2.rounded.font-bold.hover\:bg-red-700.transition-all {
+  background: #b20000 !important;
+  border-radius: 5px !important;
+  font-size: 1.05rem;
+  font-weight: 600;
+  padding: 0.7rem 0 !important;
+  margin-top: 1rem !important;
+  transition: background 0.18s;
+}
+
+.w-full.mt-2.bg-red-600.text-white.py-2.rounded.font-bold.hover\:bg-red-700.transition-all:hover {
+  background: #8c0000 !important;
+}
+
+.text-red-600.text-xs.mt-1 {
+  color: #b20000 !important;
+  font-size: 0.92rem !important;
+  margin-top: 0.18rem !important;
+}
+
+@media (max-width: 900px) {
+  .header-associacao {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .table-associacao th,
+  .table-associacao td {
+    padding: 0.7rem 0.5rem;
+    font-size: 0.97rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .container-associacao {
+    padding: 1rem 0.2rem;
+  }
+
+  .table-associacao th,
+  .table-associacao td {
+    padding: 0.5rem 0.2rem;
+    font-size: 0.92rem;
+  }
+
+  .header-associacao h2 {
+    font-size: 1.1rem;
+  }
+
+  .bg-white.rounded-xl.shadow-lg {
+    padding: 1rem 0.3rem !important;
+  }
 }

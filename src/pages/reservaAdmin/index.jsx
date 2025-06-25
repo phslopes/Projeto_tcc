@@ -2,11 +2,57 @@ import React, { useState, useEffect } from 'react';
 import './ReservaPage.css';
 import { api } from '../../utils/api';
 
+function ConfirmPopup({ open, onClose, onConfirm, professorEmail }) {
+  const [step, setStep] = useState(0);
+  React.useEffect(() => { if (open) setStep(0); }, [open]);
+  if (!open) return null;
+  return (
+    <div className="popup-overlay">
+      <div className="popup" style={{ minWidth: 320, padding: '2rem 2.5rem', borderRadius: 14, boxShadow: '0 4px 24px rgba(0,0,0,0.13)', textAlign: 'center', position: 'relative' }}>
+        {step === 0 ? (
+          <>
+            <div style={{ fontSize: 38, color: '#4caf50', marginBottom: 10 }}>
+              <span role="img" aria-label="confirmação">✔️</span>
+            </div>
+            <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 10 }}>Confirmar Reserva</h3>
+            <p style={{ fontSize: 16, color: '#333', marginBottom: 8 }}>Tem certeza que deseja confirmar esta reserva?</p>
+            <div style={{ marginTop: 18, display: 'flex', justifyContent: 'center', gap: 16 }}>
+              <button
+                onClick={async () => { await onConfirm(); setStep(1); }}
+                style={{ background: '#4caf50', color: 'white', border: 'none', padding: '10px 28px', borderRadius: 6, fontWeight: 600, fontSize: 16, cursor: 'pointer', boxShadow: '0 2px 8px rgba(76,175,80,0.08)' }}
+              >
+                Sim, confirmar
+              </button>
+              <button
+                onClick={onClose}
+                style={{ background: '#eee', color: '#333', border: 'none', padding: '10px 28px', borderRadius: 6, fontWeight: 600, fontSize: 16, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+              >
+                Cancelar
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div style={{ fontSize: 38, color: '#4caf50', marginBottom: 10 }}>
+              <span role="img" aria-label="confirmação">✔️</span>
+            </div>
+            <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 10 }}>Reserva confirmada!</h3>
+            <p style={{ fontSize: 16, color: '#333', marginBottom: 8 }}>Um e-mail foi enviado para o professor{professorEmail ? ` (${professorEmail})` : ''}.</p>
+            <button onClick={onClose} style={{ marginTop: 16, padding: '10px 28px', borderRadius: 6, background: '#4caf50', color: 'white', border: 'none', fontWeight: 600, fontSize: 16, boxShadow: '0 2px 8px rgba(76,175,80,0.08)', cursor: 'pointer' }}>OK</button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ReservaAdmin() {
   const [allocations, setAllocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [popupItem, setPopupItem] = useState(null);
 
   const diasSemana = [
     { value: 2, label: 'Segunda-feira' },
@@ -27,12 +73,8 @@ export default function ReservaAdmin() {
     const fetchAllocations = async () => {
       setLoading(true);
       try {
-        const response = await api.get('/allocations');
-        // Filtra apenas alocações esporádicas
-        const esporadicas = response.filter(allocation => 
-          allocation.tipo_alocacao === 'esporadico'
-        );
-        setAllocations(esporadicas || []);
+        const response = await api.get('/allocations', { params: { tipoAlocacao: 'esporadico', status: 'pendente' } });
+        setAllocations(response || []);
       } catch (err) {
         setError('Erro ao carregar as alocações: ' + err.message);
       } finally {
@@ -45,32 +87,44 @@ export default function ReservaAdmin() {
 
   const handleStatusChange = async (allocation, newStatus) => {
     setUpdatingStatus(allocation.numero_sala + '-' + allocation.tipo_sala);
-    
+
     try {
-      // Formatar hora_inicio para o formato correto (HH:MM:SS)
-      const horaInicio = allocation.hora_inicio ? 
-        (allocation.hora_inicio.includes(':00') ? allocation.hora_inicio : allocation.hora_inicio + ':00') : 
+      const horaInicio = allocation.hora_inicio ?
+        (allocation.hora_inicio.includes(':00') ? allocation.hora_inicio : allocation.hora_inicio + ':00') :
         '00:00:00';
 
       await api.put(`/allocations/${allocation.numero_sala}/${allocation.tipo_sala}/${allocation.id_professor}/${allocation.disciplina_nome}/${allocation.disciplina_turno}/${allocation.ano}/${allocation.semestre_alocacao}/${allocation.dia_semana}/${horaInicio}/status`, {
         status: newStatus
       });
 
-      // Atualiza a lista local
-      setAllocations(prev => 
-        prev.map(item => 
-          item.numero_sala === allocation.numero_sala && 
-          item.tipo_sala === allocation.tipo_sala &&
-          item.id_professor === allocation.id_professor &&
-          item.disciplina_nome === allocation.disciplina_nome &&
-          item.disciplina_turno === allocation.disciplina_turno &&
-          item.ano === allocation.ano &&
-          item.semestre_alocacao === allocation.semestre_alocacao &&
-          item.dia_semana === allocation.dia_semana &&
-          item.hora_inicio === allocation.hora_inicio
-            ? { ...item, alocacao_status: newStatus }
-            : item
-        )
+      setAllocations(prev =>
+        newStatus === 'confirmada'
+          ? prev.filter(item =>
+            !(
+              item.numero_sala === allocation.numero_sala &&
+              item.tipo_sala === allocation.tipo_sala &&
+              item.id_professor === allocation.id_professor &&
+              item.disciplina_nome === allocation.disciplina_nome &&
+              item.disciplina_turno === allocation.disciplina_turno &&
+              item.ano === allocation.ano &&
+              item.semestre_alocacao === allocation.semestre_alocacao &&
+              item.dia_semana === allocation.dia_semana &&
+              item.hora_inicio === allocation.hora_inicio
+            )
+          )
+          : prev.map(item =>
+            item.numero_sala === allocation.numero_sala &&
+              item.tipo_sala === allocation.tipo_sala &&
+              item.id_professor === allocation.id_professor &&
+              item.disciplina_nome === allocation.disciplina_nome &&
+              item.disciplina_turno === allocation.disciplina_turno &&
+              item.ano === allocation.ano &&
+              item.semestre_alocacao === allocation.semestre_alocacao &&
+              item.dia_semana === allocation.dia_semana &&
+              item.hora_inicio === allocation.hora_inicio
+              ? { ...item, alocacao_status: newStatus }
+              : item
+          )
       );
 
     } catch (err) {
@@ -142,23 +196,20 @@ export default function ReservaAdmin() {
                   </span>
                 </td>
                 <td>
-                  <select
-                    value={item.alocacao_status}
-                    onChange={(e) => handleStatusChange(item, e.target.value)}
-                    disabled={updatingStatus === item.numero_sala + '-' + item.tipo_sala}
+                  <button
+                    onClick={() => { setPopupItem(item); setPopupOpen(true); }}
+                    disabled={updatingStatus === item.numero_sala + '-' + item.tipo_sala || item.alocacao_status === 'confirmada'}
                     style={{
-                      padding: '4px 8px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                      fontSize: '12px'
+                      backgroundColor: '#4caf50', color: 'white', border: 'none', borderRadius: 4, padding: '4px 10px', marginRight: 8, fontWeight: 'bold', cursor: item.alocacao_status === 'confirmada' ? 'not-allowed' : 'pointer'
                     }}
-                  >
-                    {statusOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  >Confirmar</button>
+                  <button
+                    onClick={() => handleStatusChange(item, 'cancelada')}
+                    disabled={updatingStatus === item.numero_sala + '-' + item.tipo_sala || item.alocacao_status === 'cancelada'}
+                    style={{
+                      backgroundColor: '#f44336', color: 'white', border: 'none', borderRadius: 4, padding: '4px 10px', fontWeight: 'bold', cursor: item.alocacao_status === 'cancelada' ? 'not-allowed' : 'pointer'
+                    }}
+                  >Cancelar</button>
                   {updatingStatus === item.numero_sala + '-' + item.tipo_sala && (
                     <span style={{ marginLeft: '8px', fontSize: '12px', color: '#666' }}>
                       Atualizando...
@@ -174,6 +225,14 @@ export default function ReservaAdmin() {
           )}
         </tbody>
       </table>
+      <ConfirmPopup
+        open={popupOpen}
+        onClose={() => { setPopupOpen(false); setPopupItem(null); }}
+        onConfirm={async () => {
+          if (popupItem) await handleStatusChange(popupItem, 'confirmada');
+        }}
+        professorEmail={popupItem?.professor_email || ''}
+      />
     </div>
   );
 }

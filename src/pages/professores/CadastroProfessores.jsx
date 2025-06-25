@@ -1,20 +1,20 @@
 import { useState, useEffect } from "react";
 
 function CadastroProfessores({ onSave, onCancel, initialData }) {
-  const [id_professor, setIdProfessor] = useState(""); // Novo estado para ID do professor (apenas para edição)
+  const [id_professor, setIdProfessor] = useState("");
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");
-
+  const [erros, setErros] = useState({});
 
   useEffect(() => {
     if (initialData) {
-      setIdProfessor(initialData.id_professor); // Define o ID para edição
+      setIdProfessor(initialData.id_professor);
       setNome(initialData.nome);
       setTelefone(initialData.telefone);
       setEmail(initialData.email);
     } else {
-      // Limpa os campos para novo cadastro
+
       setIdProfessor("");
       setNome("");
       setTelefone("");
@@ -22,18 +22,28 @@ function CadastroProfessores({ onSave, onCancel, initialData }) {
     }
   }, [initialData]);
 
+  function formatarTelefone(valor) {
+    const numeros = valor.replace(/\D/g, "");
+    if (numeros.length <= 10) {
+      return numeros.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3").replace(/-$/, "");
+    } else {
+      return numeros.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3").replace(/-$/, "");
+    }
+  }
+
+  function validarEmail(email) {
+    return /^[\w-.]+@([\w-]+\.)+[\w-]{2,}$/.test(email);
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (
-      !nome.trim() ||
-      !telefone.trim() ||
-      !email.trim()
-    ) {
-      alert("Preencha todos os campos!");
-      return;
-    }
+    const novosErros = {};
+    if (!nome.trim()) novosErros.nome = "Nome obrigatório.";
+    if (!telefone.trim() || telefone.replace(/\D/g, "").length < 10) novosErros.telefone = "Telefone válido obrigatório.";
+    if (!email.trim() || !validarEmail(email)) novosErros.email = "E-mail válido obrigatório.";
+    setErros(novosErros);
+    if (Object.keys(novosErros).length > 0) return;
 
-    // Se for edição, inclui o id_professor no objeto
     const professorData = initialData ? { ...initialData, nome, telefone, email } : { nome, telefone, email };
     onSave(professorData);
   };
@@ -51,18 +61,6 @@ function CadastroProfessores({ onSave, onCancel, initialData }) {
           {initialData ? "Editar Cadastro" : "Cadastrar Professor"}
         </h3>
         <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
-          {initialData && ( // Exibe o ID apenas em modo de edição
-            <label className="flex flex-col text-sm font-medium text-gray-700">
-              ID do Professor:
-              <input
-                type="text"
-                value={id_professor}
-                readOnly // ID não deve ser editável
-                className="mt-1 p-2 border border-gray-300 rounded bg-gray-100 cursor-not-allowed"
-              />
-            </label>
-          )}
-
           <label className="flex flex-col text-sm font-medium text-gray-700">
             Nome:
             <input
@@ -72,6 +70,7 @@ function CadastroProfessores({ onSave, onCancel, initialData }) {
               placeholder="Nome do professor"
               className="mt-1 p-2 border border-gray-300 rounded"
             />
+            {erros.nome && <span className="text-red-600 text-xs mt-1">{erros.nome}</span>}
           </label>
 
           <label className="flex flex-col text-sm font-medium text-gray-700">
@@ -79,22 +78,24 @@ function CadastroProfessores({ onSave, onCancel, initialData }) {
             <input
               type="text"
               value={telefone}
-              onChange={(e) => setTelefone(e.target.value)}
-              placeholder="Informe o telefone"
+              onChange={(e) => setTelefone(formatarTelefone(e.target.value))}
+              placeholder="(99) 99999-9999"
               className="mt-1 p-2 border border-gray-300 rounded"
-              maxLength={11} // Limita o tamanho do telefone
+              maxLength={15}
             />
+            {erros.telefone && <span className="text-red-600 text-xs mt-1">{erros.telefone}</span>}
           </label>
 
           <label className="flex flex-col text-sm font-medium text-gray-700">
             Email:
             <input
-              type="text"
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Informe o email"
               className="mt-1 p-2 border border-gray-300 rounded"
             />
+            {erros.email && <span className="text-red-600 text-xs mt-1">{erros.email}</span>}
           </label>
 
           <button

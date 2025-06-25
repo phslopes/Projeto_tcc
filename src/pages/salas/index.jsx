@@ -10,7 +10,6 @@ function SalasPage() {
   const [salaEditando, setSalaEditando] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Buscar salas ao carregar
   useEffect(() => {
     fetchSalas();
   }, []);
@@ -27,7 +26,6 @@ function SalasPage() {
     }
   };
 
-  // Adicionar sala via API
   const adicionarSala = async (sala) => {
     try {
       await api.post("/rooms", {
@@ -41,7 +39,6 @@ function SalasPage() {
     }
   };
 
-  // Atualizar sala via API
   const atualizarSala = async (salaAtualizada) => {
     if (!salaEditando) return;
     try {
@@ -50,7 +47,7 @@ function SalasPage() {
         {
           numero_sala: salaAtualizada.number,
           tipo_sala: salaAtualizada.type.toLowerCase(),
-          status: "livre", // ou mantenha o status atual se quiser buscar antes
+          status: "livre",
         }
       );
       fetchSalas();
@@ -61,7 +58,6 @@ function SalasPage() {
     }
   };
 
-  // Excluir sala via API
   const excluirSala = async (salaParaExcluir) => {
     if (window.confirm("Tem certeza que deseja excluir esta sala?")) {
       try {
@@ -75,7 +71,6 @@ function SalasPage() {
     }
   };
 
-  // Função para editar sala
   const handleEditarSala = (sala) => {
     setSalaEditando({
       oldNumber: sala.numero_sala,
