@@ -280,9 +280,14 @@ export default function Reserva() {
           <label>Professor</label>
           <select name="id_professor" value={filtros.id_professor} onChange={handleFiltroChange}>
             <option value="">Selecione</option>
-            {professores.map(p => (
-              <option key={p.id_professor} value={p.id_professor}>{p.nome}</option>
-            ))}
+            {professores
+              .slice()
+              .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }))
+              .map((p) => (
+                <option key={p.id_professor} value={p.id_professor}>
+                  {p.nome}
+                </option>
+              ))}
           </select>
         </div>
         <div className="filtro">
@@ -377,7 +382,7 @@ export default function Reserva() {
                   </div>
                 ) : (
                   <button
-                    style={{ backgroundColor: '#B20000', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer'}}
+                    style={{ backgroundColor: '#B20000', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}
                     onClick={() => handleConfirmar(item)}
                   >
                     Solicitar
