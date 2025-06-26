@@ -9,7 +9,6 @@ function CadastroSalas({ onSave, onCancel, initialData }) {
       setNumber(initialData.number ? String(initialData.number) : "");
       setType(initialData.type ? initialData.type.toLowerCase() : "");
     } else {
-      // Limpa os campos quando não há initialData (novo cadastro)
       setNumber("");
       setType("");
     }
@@ -17,22 +16,21 @@ function CadastroSalas({ onSave, onCancel, initialData }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!number || number.trim() === "") {
       alert("Preencha o número da sala!");
       return;
     }
-    
+
     if (!type || type === "") {
       alert("Selecione o tipo da sala!");
       return;
     }
-    
-    // Debug dos valores enviados
+
     console.log("Enviando:", { number, type });
-    onSave({ 
-      number: parseInt(number), 
-      type: type.toLowerCase() 
+    onSave({
+      number: parseInt(number),
+      type: type.toLowerCase()
     });
   };
 
@@ -56,7 +54,6 @@ function CadastroSalas({ onSave, onCancel, initialData }) {
               value={number}
               inputMode="numeric"
               onChange={(e) => {
-                // Garante que o campo nunca fique vazio ao editar
                 const value = e.target.value.replace(/\D/g, "");
                 setNumber(value);
               }}

@@ -2,11 +2,58 @@ import React, { useState, useEffect } from 'react';
 import './ReservaPage.css';
 import { api } from '../../utils/api';
 
+function ConfirmPopup({ open, onClose, onConfirm, popupMode, professorEmail }) {
+  const [step, setStep] = useState(0);
+  React.useEffect(() => { if (open) setStep(0); }, [open]);
+  if (!open) return null;
+  return (
+    <div className="popup-overlay">
+      <div className="popup" style={{ minWidth: 320, padding: '2rem 2.5rem', borderRadius: 14, boxShadow: '0 4px 24px rgba(0,0,0,0.13)', textAlign: 'center', position: 'relative' }}>
+        {step === 0 ? (
+          <>
+            <div style={{ fontSize: 38, color: popupMode === 'delete' ? '#f44336' : '#4caf50', marginBottom: 10 }}>
+              <span role="img" aria-label={popupMode === 'delete' ? 'exclusão' : 'confirmação'}>{popupMode === 'delete' ? '🗑️' : '✔️'}</span>
+            </div>
+            <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 10 }}>{popupMode === 'delete' ? 'Excluir Reserva' : 'Confirmar Reserva'}</h3>
+            <p style={{ fontSize: 16, color: '#333', marginBottom: 8 }}>{popupMode === 'delete' ? 'Tem certeza que deseja excluir esta reserva? Esta ação não poderá ser desfeita.' : 'Tem certeza que deseja confirmar esta reserva?'}</p>
+            <div style={{ marginTop: 18, display: 'flex', justifyContent: 'center', gap: 16 }}>
+              <button
+                onClick={async () => { await onConfirm(); setStep(1); }}
+                style={{ background: popupMode === 'delete' ? '#f44336' : '#4caf50', color: 'white', border: 'none', padding: '10px 28px', borderRadius: 6, fontWeight: 600, fontSize: 16, cursor: 'pointer', boxShadow: popupMode === 'delete' ? '0 2px 8px rgba(244,67,54,0.08)' : '0 2px 8px rgba(76,175,80,0.08)' }}
+              >
+                {popupMode === 'delete' ? 'Sim, excluir' : 'Sim, confirmar'}
+              </button>
+              <button
+                onClick={onClose}
+                style={{ background: '#eee', color: '#333', border: 'none', padding: '10px 28px', borderRadius: 6, fontWeight: 600, fontSize: 16, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+              >
+                Cancelar
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div style={{ fontSize: 38, color: popupMode === 'delete' ? '#f44336' : '#4caf50', marginBottom: 10 }}>
+              <span role="img" aria-label={popupMode === 'delete' ? 'exclusão' : 'confirmação'}>{popupMode === 'delete' ? '🗑️' : '✔️'}</span>
+            </div>
+            <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 10 }}>{popupMode === 'delete' ? 'Reserva excluída!' : 'Reserva confirmada!'}</h3>
+            <p style={{ fontSize: 16, color: '#333', marginBottom: 8 }}>{popupMode === 'delete' ? 'A reserva foi excluída com sucesso.' : `Um e-mail foi enviado para o professor${professorEmail ? ` (${professorEmail})` : ''}.`}</p>
+            <button onClick={onClose} style={{ marginTop: 16, padding: '10px 28px', borderRadius: 6, background: popupMode === 'delete' ? '#f44336' : '#4caf50', color: 'white', border: 'none', fontWeight: 600, fontSize: 16, boxShadow: popupMode === 'delete' ? '0 2px 8px rgba(244,67,54,0.08)' : '0 2px 8px rgba(76,175,80,0.08)', cursor: 'pointer' }}>OK</button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ReservaAdmin() {
   const [allocations, setAllocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [updatingStatus, setUpdatingStatus] = useState(null);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [popupItem, setPopupItem] = useState(null);
+  const [popupMode, setPopupMode] = useState('confirm');
 
   const diasSemana = [
     { value: 2, label: 'Segunda-feira' },
@@ -27,12 +74,8 @@ export default function ReservaAdmin() {
     const fetchAllocations = async () => {
       setLoading(true);
       try {
-        const response = await api.get('/allocations');
-        // Filtra apenas alocações esporádicas
-        const esporadicas = response.filter(allocation => 
-          allocation.tipo_alocacao === 'esporadico'
-        );
-        setAllocations(esporadicas || []);
+        const response = await api.get('/allocations', { params: { tipoAlocacao: 'esporadico', status: 'pendente' } });
+        setAllocations(response || []);
       } catch (err) {
         setError('Erro ao carregar as alocações: ' + err.message);
       } finally {
@@ -45,32 +88,44 @@ export default function ReservaAdmin() {
 
   const handleStatusChange = async (allocation, newStatus) => {
     setUpdatingStatus(allocation.numero_sala + '-' + allocation.tipo_sala);
-    
+
     try {
-      // Formatar hora_inicio para o formato correto (HH:MM:SS)
-      const horaInicio = allocation.hora_inicio ? 
-        (allocation.hora_inicio.includes(':00') ? allocation.hora_inicio : allocation.hora_inicio + ':00') : 
+      const horaInicio = allocation.hora_inicio ?
+        (allocation.hora_inicio.includes(':00') ? allocation.hora_inicio : allocation.hora_inicio + ':00') :
         '00:00:00';
 
       await api.put(`/allocations/${allocation.numero_sala}/${allocation.tipo_sala}/${allocation.id_professor}/${allocation.disciplina_nome}/${allocation.disciplina_turno}/${allocation.ano}/${allocation.semestre_alocacao}/${allocation.dia_semana}/${horaInicio}/status`, {
         status: newStatus
       });
 
-      // Atualiza a lista local
-      setAllocations(prev => 
-        prev.map(item => 
-          item.numero_sala === allocation.numero_sala && 
-          item.tipo_sala === allocation.tipo_sala &&
-          item.id_professor === allocation.id_professor &&
-          item.disciplina_nome === allocation.disciplina_nome &&
-          item.disciplina_turno === allocation.disciplina_turno &&
-          item.ano === allocation.ano &&
-          item.semestre_alocacao === allocation.semestre_alocacao &&
-          item.dia_semana === allocation.dia_semana &&
-          item.hora_inicio === allocation.hora_inicio
-            ? { ...item, alocacao_status: newStatus }
-            : item
-        )
+      setAllocations(prev =>
+        newStatus === 'confirmada'
+          ? prev.filter(item =>
+            !(
+              item.numero_sala === allocation.numero_sala &&
+              item.tipo_sala === allocation.tipo_sala &&
+              item.id_professor === allocation.id_professor &&
+              item.disciplina_nome === allocation.disciplina_nome &&
+              item.disciplina_turno === allocation.disciplina_turno &&
+              item.ano === allocation.ano &&
+              item.semestre_alocacao === allocation.semestre_alocacao &&
+              item.dia_semana === allocation.dia_semana &&
+              item.hora_inicio === allocation.hora_inicio
+            )
+          )
+          : prev.map(item =>
+            item.numero_sala === allocation.numero_sala &&
+              item.tipo_sala === allocation.tipo_sala &&
+              item.id_professor === allocation.id_professor &&
+              item.disciplina_nome === allocation.disciplina_nome &&
+              item.disciplina_turno === allocation.disciplina_turno &&
+              item.ano === allocation.ano &&
+              item.semestre_alocacao === allocation.semestre_alocacao &&
+              item.dia_semana === allocation.dia_semana &&
+              item.hora_inicio === allocation.hora_inicio
+              ? { ...item, alocacao_status: newStatus }
+              : item
+          )
       );
 
     } catch (err) {
@@ -142,23 +197,20 @@ export default function ReservaAdmin() {
                   </span>
                 </td>
                 <td>
-                  <select
-                    value={item.alocacao_status}
-                    onChange={(e) => handleStatusChange(item, e.target.value)}
+                  <button
+                    onClick={() => { setPopupItem(item); setPopupMode('confirm'); setPopupOpen(true); }}
+                    disabled={updatingStatus === item.numero_sala + '-' + item.tipo_sala || item.alocacao_status === 'confirmada'}
+                    style={{
+                      backgroundColor: '#4caf50', color: 'white', border: 'none', borderRadius: 4, padding: '4px 10px', marginRight: 8, fontWeight: 'bold', cursor: item.alocacao_status === 'confirmada' ? 'not-allowed' : 'pointer'
+                    }}
+                  >Confirmar</button>
+                  <button
+                    onClick={() => { setPopupItem(item); setPopupMode('delete'); setPopupOpen(true); }}
                     disabled={updatingStatus === item.numero_sala + '-' + item.tipo_sala}
                     style={{
-                      padding: '4px 8px',
-                      borderRadius: '4px',
-                      border: '1px solid #ccc',
-                      fontSize: '12px'
+                      backgroundColor: '#f44336', color: 'white', border: 'none', borderRadius: 4, padding: '4px 10px', fontWeight: 'bold', cursor: 'pointer'
                     }}
-                  >
-                    {statusOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                  >Cancelar</button>
                   {updatingStatus === item.numero_sala + '-' + item.tipo_sala && (
                     <span style={{ marginLeft: '8px', fontSize: '12px', color: '#666' }}>
                       Atualizando...
@@ -174,6 +226,35 @@ export default function ReservaAdmin() {
           )}
         </tbody>
       </table>
+      <ConfirmPopup
+        open={popupOpen}
+        onClose={() => { setPopupOpen(false); setPopupItem(null); }}
+        onConfirm={async () => {
+          if (popupItem && popupMode === 'confirm') await handleStatusChange(popupItem, 'confirmada');
+          if (popupItem && popupMode === 'delete') {
+            try {
+              await api.delete(`/allocations/${popupItem.numero_sala}/${popupItem.tipo_sala}/${popupItem.id_professor}/${popupItem.disciplina_nome}/${popupItem.disciplina_turno}/${popupItem.ano}/${popupItem.semestre_alocacao}`);
+              setAllocations(prev => prev.filter(item =>
+                !(
+                  item.numero_sala === popupItem.numero_sala &&
+                  item.tipo_sala === popupItem.tipo_sala &&
+                  item.id_professor === popupItem.id_professor &&
+                  item.disciplina_nome === popupItem.disciplina_nome &&
+                  item.disciplina_turno === popupItem.disciplina_turno &&
+                  item.ano === popupItem.ano &&
+                  item.semestre_alocacao === popupItem.semestre_alocacao
+                )
+              ));
+              setPopupOpen(false);
+              setPopupItem(null);
+            } catch (err) {
+              setError('Erro ao excluir reserva: ' + err.message);
+            }
+          }
+        }}
+        popupMode={popupMode}
+        professorEmail={popupItem?.professor_email || ''}
+      />
     </div>
   );
 }

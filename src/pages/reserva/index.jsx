@@ -3,9 +3,9 @@ import './ReservaPage.css';
 import { api } from '../../utils/api';
 
 const horariosPorTurno = {
-  "Manhã": ["07:00", "07:50", "08:40", "09:30", "10:20", "11:10"],
-  "Tarde": ["13:00", "13:50", "14:40", "15:30", "16:20", "17:10"],
-  "Noite": ["18:00", "18:50", "19:40", "20:30", "21:20", "22:10"]
+  "Manhã": ["08:00", "08:50", "09:40", "10:00", "10:40", "11:30"],
+  "Tarde": ["13:00", "13:50", "15:00", "15:50", "16:50", "17:40"],
+  "Noite": ["19:00", "19:50", "21:00", "21:50"]
 };
 
 export default function Reserva() {
@@ -31,7 +31,7 @@ export default function Reserva() {
   const [error, setError] = useState(null);
   const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
 
-  // Busca dados iniciais (professores e salas)
+
   useEffect(() => {
     const fetchInitialData = async () => {
       setLoading(true);
@@ -53,7 +53,7 @@ export default function Reserva() {
     fetchInitialData();
   }, []);
 
-  // Busca disciplinas do professor selecionado
+
   useEffect(() => {
     const fetchDisciplinas = async () => {
       if (filtros.id_professor) {
@@ -71,7 +71,6 @@ export default function Reserva() {
     fetchDisciplinas();
   }, [filtros.id_professor]);
 
-  // Verifica se professor tem aula programada quando horário é selecionado
   useEffect(() => {
     const checkProfessorSchedule = async () => {
       if (filtros.id_professor && filtros.nome && filtros.turno && filtros.dia_semana && filtros.horario) {
@@ -108,7 +107,6 @@ export default function Reserva() {
     checkProfessorSchedule();
   }, [filtros.id_professor, filtros.nome, filtros.turno, filtros.dia_semana, filtros.horario]);
 
-  // Busca salas disponíveis quando horário e dia são selecionados
   useEffect(() => {
     const fetchSalasDisponiveis = async () => {
       if (filtros.dia_semana && filtros.horario) {
@@ -119,7 +117,7 @@ export default function Reserva() {
               hora_inicio: filtros.horario + ':00'
             }
           });
-          
+
           setSalasDisponiveis(response);
         } catch (err) {
           setError('Erro ao verificar disponibilidade de salas: ' + err.message);
@@ -132,14 +130,12 @@ export default function Reserva() {
     fetchSalasDisponiveis();
   }, [filtros.dia_semana, filtros.horario]);
 
-  // Calcula ano e semestre atuais
   const anoAtual = new Date().getFullYear();
   const mesAtual = new Date().getMonth() + 1;
   const semestreAtual = mesAtual <= 6 ? 1 : 2;
 
-  // Deriva opções para os selects a partir dos dados atuais
   const nomesDisciplinasUnicos = Array.from(new Set(disciplinas.map(d => d.disciplina_nome)));
-  
+
   const turnosDisponiveis = Array.from(
     new Set(
       disciplinas
@@ -148,10 +144,8 @@ export default function Reserva() {
     )
   );
 
-  // Horários disponíveis baseados no turno selecionado
   const horariosDisponiveis = filtros.turno ? horariosPorTurno[filtros.turno] || [] : [];
 
-  // Dias da semana
   const diasSemana = [
     { value: 2, label: 'Segunda-feira' },
     { value: 3, label: 'Terça-feira' },
@@ -161,7 +155,6 @@ export default function Reserva() {
     { value: 7, label: 'Sábado' },
   ];
 
-  // Tipos de sala
   const tiposSala = [
     { value: 'sala', label: 'Sala' },
     { value: 'laboratorio', label: 'Laboratório' },
@@ -172,7 +165,6 @@ export default function Reserva() {
     setFiltros(prev => {
       const newFiltros = { ...prev, [name]: value };
 
-      // Reset em cascata
       if (name === 'id_professor') {
         newFiltros.nome = '';
         newFiltros.turno = '';
@@ -208,7 +200,6 @@ export default function Reserva() {
     });
   };
 
-  // Handle reserva
   const handleConfirmar = (item) => {
     setLinhaConfirmada(item);
     setMostrarPopup(true);
@@ -245,7 +236,6 @@ export default function Reserva() {
       setReservados([...reservados, linhaConfirmada]);
       setMostrarConfirmacao(true);
 
-      // Atualiza a lista de salas disponíveis
       const response = await api.get('/allocations/room-availability', {
         params: {
           dia_semana: filtros.dia_semana,
@@ -262,7 +252,6 @@ export default function Reserva() {
     }
   };
 
-  // Monta linhas possíveis para reserva baseado nas salas disponíveis
   const linhasReserva = salasDisponiveis
     .map(sala => ({
       numero_sala: sala.numero_sala,
@@ -273,7 +262,7 @@ export default function Reserva() {
       dia_semana: filtros.dia_semana,
     }))
     .filter(item => {
-      return item.nome && item.turno && item.horario && item.dia_semana;
+      return item.nome && item.turno && item.horario && item.dia_semana && (!filtros.tipo_sala || item.tipo_sala === filtros.tipo_sala);
     });
 
   if (loading) return <div>Carregando...</div>;
@@ -291,9 +280,14 @@ export default function Reserva() {
           <label>Professor</label>
           <select name="id_professor" value={filtros.id_professor} onChange={handleFiltroChange}>
             <option value="">Selecione</option>
-            {professores.map(p => (
-              <option key={p.id_professor} value={p.id_professor}>{p.nome}</option>
-            ))}
+            {professores
+              .slice()
+              .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' }))
+              .map((p) => (
+                <option key={p.id_professor} value={p.id_professor}>
+                  {p.nome}
+                </option>
+              ))}
           </select>
         </div>
         <div className="filtro">
@@ -346,31 +340,16 @@ export default function Reserva() {
             ))}
           </select>
         </div>
-        <div className="filtro">
-          <label>Sala</label>
-          <select name="numero_sala" value={filtros.numero_sala} onChange={handleFiltroChange} disabled={!filtros.horario}>
-            <option value="">Selecione</option>
-            {salasDisponiveis
-              .filter(s => !filtros.tipo_sala || s.tipo_sala === filtros.tipo_sala)
-              .map(s => (
-                <option key={s.numero_sala + '-' + s.tipo_sala} value={s.numero_sala}>
-                  {s.numero_sala} ({s.tipo_sala})
-                </option>
-              ))}
-          </select>
-        </div>
       </div>
 
       <hr className="linha-separadora" />
 
-      {/* Aviso sobre programação do professor */}
       {scheduleWarning && (
         <div style={{ marginBottom: '20px', padding: '10px', backgroundColor: '#fff3cd', border: '1px solid #ffeaa7', borderRadius: '5px', color: '#856404' }}>
           <strong>⚠️ Aviso:</strong> {scheduleWarning}
         </div>
       )}
 
-      {/* Mostrar informações sobre disponibilidade */}
       {filtros.dia_semana && filtros.horario && (
         <div style={{ marginBottom: '20px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
           <strong>Salas disponíveis para {diasSemana.find(d => String(d.value) === String(filtros.dia_semana))?.label} às {filtros.horario}:</strong> {salasDisponiveis.length} salas
@@ -385,7 +364,7 @@ export default function Reserva() {
             <th>Turno</th>
             <th>Horário</th>
             <th>Dia</th>
-            <th>Solicitar Reserva</th>
+            <th>Reserva</th>
           </tr>
         </thead>
         <tbody>
@@ -403,10 +382,10 @@ export default function Reserva() {
                   </div>
                 ) : (
                   <button
-                    style={{ backgroundColor: 'red', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}
+                    style={{ backgroundColor: '#B20000', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}
                     onClick={() => handleConfirmar(item)}
                   >
-                    Confirmar
+                    Solicitar
                   </button>
                 )}
               </td>
@@ -424,17 +403,33 @@ export default function Reserva() {
 
       {mostrarPopup && linhaConfirmada && (
         <div className="popup-overlay">
-          <div className="popup">
-            <h3>Confirmar Reserva</h3>
-            <p>Você deseja reservar a sala {linhaConfirmada.numero_sala} ({linhaConfirmada.tipo_sala}) no horário {linhaConfirmada.horario}?</p>
+          <div className="popup" style={{ minWidth: 320, padding: '2rem 2.5rem', borderRadius: 14, boxShadow: '0 4px 24px rgba(0,0,0,0.13)', textAlign: 'center', position: 'relative' }}>
+            <div style={{ fontSize: 38, color: '#4caf50', marginBottom: 10 }}>
+              <span role="img" aria-label="confirmação">✔️</span>
+            </div>
+            <h3 style={{ fontSize: 22, fontWeight: 700, marginBottom: 10 }}>Confirmar Reserva</h3>
+            <p style={{ fontSize: 16, color: '#333', marginBottom: 8 }}>
+              Reservar sala <b>{linhaConfirmada.numero_sala}</b> ({linhaConfirmada.tipo_sala})<br />
+              <span style={{ fontWeight: 500 }}>Horário:</span> {linhaConfirmada.horario}
+            </p>
             {scheduleWarning && (
-              <p style={{ color: '#856404', fontSize: '14px' }}>
+              <p style={{ color: '#b20000', fontSize: '15px', marginBottom: 8 }}>
                 <strong>Nota:</strong> Este horário não está programado na grade do professor.
               </p>
             )}
-            <div style={{ marginTop: '10px' }}>
-              <button onClick={confirmarReserva} style={{ marginRight: '10px', backgroundColor: 'green', color: 'white' }}>Sim</button>
-              <button onClick={() => setMostrarPopup(false)}>Cancelar</button>
+            <div style={{ marginTop: 18, display: 'flex', justifyContent: 'center', gap: 16 }}>
+              <button
+                onClick={confirmarReserva}
+                style={{ background: '#4caf50', color: 'white', border: 'none', padding: '10px 28px', borderRadius: 6, fontWeight: 600, fontSize: 16, cursor: 'pointer', boxShadow: '0 2px 8px rgba(76,175,80,0.08)' }}
+              >
+                Sim, reservar
+              </button>
+              <button
+                onClick={() => setMostrarPopup(false)}
+                style={{ background: '#eee', color: '#333', border: 'none', padding: '10px 28px', borderRadius: 6, fontWeight: 600, fontSize: 16, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+              >
+                Cancelar
+              </button>
             </div>
           </div>
         </div>
