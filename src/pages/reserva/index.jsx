@@ -359,7 +359,7 @@ export default function Reserva() {
             <th>Turno</th>
             <th>Horário</th>
             <th>Dia</th>
-            <th>Solicitar Reserva</th>
+            <th>Reserva</th>
           </tr>
         </thead>
         <tbody>
@@ -377,10 +377,10 @@ export default function Reserva() {
                   </div>
                 ) : (
                   <button
-                    style={{ backgroundColor: 'red', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}
+                    style={{ backgroundColor: '#B20000', color: 'white', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer'}}
                     onClick={() => handleConfirmar(item)}
                   >
-                    Confirmar
+                    Solicitar
                   </button>
                 )}
               </td>
