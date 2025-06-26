@@ -382,12 +382,16 @@ function AssociacaoPage() {
                   onChange={(e) => setFormProfessorId(e.target.value)}
                 >
                   <option value="">Selecione o Professor</option>
-                  {professores.map((prof) => (
-                    <option key={prof.id_professor} value={prof.id_professor}>
-                      {prof.nome}
-                    </option>
-                  ))}
+                  {professores
+                    .slice()
+                    .sort((a, b) => a.nome.localeCompare(b.nome)) 
+                    .map((prof) => (
+                      <option key={prof.id_professor} value={prof.id_professor}>
+                        {prof.nome}
+                      </option>
+                    ))}
                 </select>
+
               </div>
               <div>
                 <label className="block text-base font-medium text-gray-700 mb-1">Disciplina:</label>
@@ -454,7 +458,12 @@ function AssociacaoPage() {
                     if (!formTurnoDisciplina || !formProfessorId || !formDiaSemana) {
                       return <option value="" disabled>Preencha os outros campos</option>;
                     }
-                    let horariosDisponiveis = [...(horariosPorTurno[formTurnoDisciplina] || [])];
+                    let horariosDisponiveis;
+                    if (formTurnoDisciplina === 'Noite' && parseInt(formDiaSemana) === 7) {
+                      horariosDisponiveis = [...(horariosPorTurno['Manhã'] || [])];
+                    } else {
+                      horariosDisponiveis = [...(horariosPorTurno[formTurnoDisciplina] || [])];
+                    }
                     const ano = parseInt(formAnoSemestre.substring(0, 4));
                     const semestre = parseInt(formAnoSemestre.substring(4, 5));
                     const disciplinaSelecionadaInfo = disciplinas.find(d => d.nome === formDisciplinaNome && d.turno === formTurnoDisciplina);
