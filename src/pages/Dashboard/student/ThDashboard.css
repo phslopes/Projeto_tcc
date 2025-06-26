@@ -1,3 +1,5 @@
+/* ThDashboard.css */
+
 .container-dashboard {
   padding: 2.5rem 2rem;
   font-family: 'Segoe UI', Arial, sans-serif;
@@ -7,8 +9,8 @@
 
 .header-dashboard {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: space-between; /* Mantém o h2 e o botão separados */
+  align-items: center; /* Alinha verticalmente */
   margin-bottom: 2rem;
   flex-wrap: wrap;
 }
@@ -18,8 +20,34 @@
   font-weight: 700;
   color: #333;
   letter-spacing: 1px;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.5rem; /* Removido para alinhar melhor se o flex-wrap ativar */
 }
+
+/* Estilos para o botão de sair */
+.logout-button {
+  background-color: #b20000; /* Um vermelho mais forte e associado ao seu tema */
+  color: white;
+  padding: 0.7rem 1.2rem; /* Ajustei o padding para ser mais equilibrado */
+  border: none;
+  border-radius: 6px; /* Borda arredondada suave */
+  cursor: pointer;
+  font-size: 1rem; /* Tamanho da fonte padrão */
+  font-weight: 600; /* Negrito para destaque */
+  transition: background-color 0.2s ease, transform 0.2s ease; /* Transição suave */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil para profundidade */
+  margin-left: 1rem; /* Espaçamento à esquerda do botão */
+}
+
+.logout-button:hover {
+  background-color: #8c0000; /* Tom mais escuro ao passar o mouse */
+  transform: translateY(-1px); /* Pequeno efeito de elevação */
+}
+
+.logout-button:active {
+  background-color: #660000; /* Tom ainda mais escuro ao clicar */
+  transform: translateY(0); /* Volta à posição original ao clicar */
+}
+
 
 .linha-separadora {
   border: none;
@@ -144,6 +172,19 @@
 
   .header-dashboard h2 {
     font-size: 1.2rem;
+  }
+
+  .logout-button {
+    font-size: 0.9rem;
+    padding: 0.6rem 1rem;
+    margin-left: 0; /* Remove a margem extra em telas pequenas */
+    margin-top: 0.5rem; /* Adiciona um pequeno espaçamento do título */
+    width: 100%; /* Ocupa a largura total em telas pequenas se necessário */
+    text-align: center;
+  }
+  /* Ajuste para o header-dashboard em telas pequenas */
+  .header-dashboard {
+    align-items: center; /* Centraliza itens em coluna */
   }
 }
 

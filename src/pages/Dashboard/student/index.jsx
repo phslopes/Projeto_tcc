@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './ThDashboard.css';
 import { api } from '../../../utils/api';
+import { useNavigate } from 'react-router-dom';
 
 export default function AlocacaoFIltro() {
   const [alocacoesCompletas, setAlocacoesCompletas] = useState([]);
   const [filtros, setFiltros] = useState({ curso: '', turno: '', semestre: '' });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const fetchAlocacoes = async () => {
     setLoading(true);
@@ -35,6 +37,11 @@ export default function AlocacaoFIltro() {
   const handleFiltroChange = (e) => {
     const { name, value } = e.target;
     setFiltros(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    navigate('/login');
   };
 
   const dadosFiltrados = alocacoesCompletas.filter(item =>
@@ -66,6 +73,7 @@ export default function AlocacaoFIltro() {
     <div className="container-dashboard">
       <div className="header-dashboard">
         <h2>Grade de Aulas</h2>
+        <button className="logout-button" onClick={handleLogout}>Sair</button> {/* Botão agora está aqui */}
       </div>
       <hr className="linha-separadora" />
       <div className="filtros">
