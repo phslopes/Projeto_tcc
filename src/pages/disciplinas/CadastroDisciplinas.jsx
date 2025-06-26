@@ -1,30 +1,30 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react'
 
 function CadastroDisciplinas({ onSave, onCancel, initialData }) {
-  const [nome, setNome] = useState("");
-  const [turno, setTurno] = useState("");
-  const [carga, setCarga] = useState("");
-  const [semestre_curso, setSemestreCurso] = useState("");
-  const [curso, setCurso] = useState("");
+  const [nome, setNome] = useState('')
+  const [turno, setTurno] = useState('')
+  const [carga, setCarga] = useState('')
+  const [semestre_curso, setSemestreCurso] = useState('')
+  const [curso, setCurso] = useState('')
 
   useEffect(() => {
     if (initialData) {
-      setNome(initialData.nome);
-      setTurno(initialData.turno);
-      setCarga(initialData.carga);
-      setSemestreCurso(initialData.semestre_curso);
-      setCurso(initialData.curso);
+      setNome(initialData.nome)
+      setTurno(initialData.turno)
+      setCarga(initialData.carga)
+      setSemestreCurso(initialData.semestre_curso)
+      setCurso(initialData.curso)
     } else {
-      setNome("");
-      setTurno("");
-      setCarga("");
-      setSemestreCurso("");
-      setCurso("");
+      setNome('')
+      setTurno('')
+      setCarga('')
+      setSemestreCurso('')
+      setCurso('')
     }
-  }, [initialData]);
+  }, [initialData])
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = e => {
+    e.preventDefault()
     if (
       !nome.trim() ||
       !turno.trim() ||
@@ -32,8 +32,8 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
       !semestre_curso ||
       !curso.trim()
     ) {
-      alert("Preencha todos os campos!");
-      return;
+      alert('Preencha todos os campos!')
+      return
     }
 
     onSave({
@@ -42,8 +42,8 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
       carga: parseInt(carga),
       semestre_curso: parseInt(semestre_curso),
       curso
-    });
-  };
+    })
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
@@ -55,7 +55,7 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
           ×
         </button>
         <h3 className="text-xl font-bold mb-4 text-center">
-          {initialData ? "Editar Disciplina" : "Cadastrar Disciplina"}
+          {initialData ? 'Editar Disciplina' : 'Cadastrar Disciplina'}
         </h3>
         <form onSubmit={handleSubmit} className="flex flex-col space-y-4">
           <label className="flex flex-col text-sm font-medium text-gray-700">
@@ -63,7 +63,7 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
             <input
               type="text"
               value={nome}
-              onChange={(e) => setNome(e.target.value)}
+              onChange={e => setNome(e.target.value)}
               placeholder="Nome da disciplina"
               className="mt-1 p-2 border border-gray-300 rounded"
             />
@@ -73,7 +73,7 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
             Turno:
             <select
               value={turno}
-              onChange={(e) => setTurno(e.target.value)}
+              onChange={e => setTurno(e.target.value)}
               className="mt-1 p-2 border border-gray-300 rounded"
             >
               <option value="">Selecione</option>
@@ -83,7 +83,6 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
             </select>
           </label>
 
-
           <label className="flex flex-col text-sm font-medium text-gray-700">
             Carga Horária:
             <input
@@ -92,10 +91,10 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
               max={4}
               step={1}
               value={carga}
-              onChange={(e) => {
-                const value = parseInt(e.target.value, 10);
-                if (value >= 1 && value <= 4 || e.target.value === "") {
-                  setCarga(e.target.value);
+              onChange={e => {
+                const value = parseInt(e.target.value, 10)
+                if ((value >= 1 && value <= 4) || e.target.value === '') {
+                  setCarga(e.target.value)
                 }
               }}
               placeholder="Carga horária (1 a 4)"
@@ -111,10 +110,11 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
               max={6}
               step={1}
               value={semestre_curso}
-              onChange={(e) => {
-                const value = setSemestreCurso(e.target.value, 10);
-                if (value >= 1 && value <= 6 || e.target.value === "") {
-                  setSemestreCurso(value);
+              onChange={e => {
+                const value = e.target.value
+                // Permite apenas números entre 1 e 6, ou um campo vazio
+                if (/^[1-6]?$/.test(value)) {
+                  setSemestreCurso(value)
                 }
               }}
               placeholder="Semestre"
@@ -127,7 +127,7 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
             <input
               type="text"
               value={curso}
-              onChange={(e) => setCurso(e.target.value)}
+              onChange={e => setCurso(e.target.value)}
               placeholder="Curso"
               className="mt-1 p-2 border border-gray-300 rounded"
             />
@@ -142,7 +142,7 @@ function CadastroDisciplinas({ onSave, onCancel, initialData }) {
         </form>
       </div>
     </div>
-  );
+  )
 }
 
-export default CadastroDisciplinas;
+export default CadastroDisciplinas
